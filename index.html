@@ -2,11 +2,11 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#3978c8">
 <title>LernHeld 1.0</title>
 <style>
-:root{--blue:#3978c8;--pale:#e2efff;--bg:#f1f6fc;--ink:#26364a}
+:root{--blue:#3978c8;--blue-dark:#245d9e;--pale:#e2efff;--bg:#f1f6fc;--ink:#26364a;--muted:#66788d}
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
 header{background:var(--blue);color:white;text-align:center;padding:22px 15px}
@@ -17,29 +17,29 @@ h2,h3{color:#315f99}
 .tile,.feature{background:white;border:0;border-radius:15px;padding:17px 6px;text-align:center;box-shadow:0 3px 12px #00000012;font-weight:bold;cursor:pointer;color:var(--ink);font-size:15px}
 .tile span{display:block;font-size:29px;margin-bottom:6px}
 .camera,.primary{display:block;width:100%;margin-top:14px;padding:16px;border:0;border-radius:15px;background:var(--blue);color:white;font-size:16px;font-weight:bold;cursor:pointer;text-align:center}
-.camera{background:var(--pale);color:#245d9e;border:2px dashed var(--blue)}
+.camera{background:var(--pale);color:var(--blue-dark);border:2px dashed var(--blue)}
 .camera span{display:block;font-size:32px;margin-bottom:5px}
-.secondary{background:var(--pale);color:#245d9e}
-.back{padding:11px 16px;border:0;border-radius:10px;background:#dceafa;color:#245d9e;margin-bottom:12px;font-size:15px;cursor:pointer}
+.secondary{background:var(--pale);color:var(--blue-dark)}
+.back{padding:11px 16px;border:0;border-radius:10px;background:#dceafa;color:var(--blue-dark);margin-bottom:12px;font-size:15px;cursor:pointer}
 .feature{width:100%;display:block;text-align:left;padding:15px;margin-bottom:9px;font-size:16px}
 select,input,textarea{width:100%;padding:12px;border:1px solid #ccd8e7;border-radius:10px;font-size:16px;background:white;margin:7px 0 14px;font-family:Arial,sans-serif;color:var(--ink)}
 textarea{min-height:220px;resize:vertical;line-height:1.65;font-size:17px}
 input[type=file]{display:none}
 .preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
-.photo-card{background:white;padding:7px;border-radius:12px}
+.photo-card{background:white;padding:7px;border-radius:12px;min-width:0}
 .photo-card img{width:100%;height:150px;object-fit:contain}
-.photo-card button,.saved-item button{padding:8px 11px;border:0;border-radius:8px;margin:5px;background:var(--pale);color:#245d9e;cursor:pointer}
+.photo-card button,.saved-item button{padding:8px 11px;border:0;border-radius:8px;margin:5px;background:var(--pale);color:var(--blue-dark);cursor:pointer}
 .photo-card button{width:100%;background:#fce7e7;color:#933}
-.status{margin:12px 0;color:#245d9e;font-weight:bold;overflow-wrap:anywhere;white-space:pre-wrap}
+.status{margin:12px 0;color:var(--blue-dark);font-weight:bold;overflow-wrap:anywhere;white-space:pre-wrap}
 .saved-item,.panel{background:white;padding:15px;margin:10px 0;border-radius:12px;box-shadow:0 2px 8px #00000010}
-.hint{font-size:13px;color:#66788d}
+.hint{font-size:13px;color:var(--muted)}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .actions .primary{margin-top:8px}
 .divider{border:0;border-top:1px solid #d7e2ef;margin:18px 0}
 footer{text-align:center;padding:22px;color:#718096;font-size:13px}
 [hidden]{display:none!important}
 button:disabled{opacity:.55;cursor:wait}
-@media(max-width:440px){.grid{gap:7px}.tile{font-size:12px;padding:13px 3px}.tile span{font-size:26px}.actions{grid-template-columns:1fr}}
+@media(max-width:440px){.grid{gap:7px}.tile{font-size:12px;padding:13px 3px}.tile span{font-size:26px}.preview{grid-template-columns:1fr 1fr}.actions{grid-template-columns:1fr}}
 @media print{header,footer,button,.back{display:none!important}body{background:white}main{max-width:none;padding:0}}
 </style>
 </head>
@@ -81,11 +81,11 @@ button:disabled{opacity:.55;cursor:wait}
 </div>
 <input type="file" id="cameraInput" accept="image/*" capture="environment">
 <input type="file" id="photoInput" accept="image/*" multiple>
-<p class="hint">Du kannst mehrere Bilder aus deiner Mediathek auswählen.</p>
+<p class="hint">Du kannst mehrere Bilder aus deiner Mediathek auswählen. Bereits hinzugefügte Seiten bleiben erhalten.</p>
 <div id="preview" class="preview"></div>
 <p id="photoStatus" class="hint"></p>
 <button class="primary" id="aiRecognize">✨ KI-Texterkennung mit Gemini</button>
-<p class="hint">Bitte kontrolliere den erkannten Text anschließend.</p>
+<p class="hint">Die KI kann gedruckte und handschriftliche Inhalte aus Fotos lesen. Bitte Ergebnis anschließend kontrollieren.</p>
 <div id="progress" class="status" aria-live="polite"></div>
 <label for="recognizedText"><b>Erkannter Text – hier kannst du ihn bearbeiten</b></label>
 <textarea id="recognizedText" placeholder="Hier erscheint der erkannte Text ..."></textarea>
@@ -120,7 +120,7 @@ button:disabled{opacity:.55;cursor:wait}
 <p id="toolDescription"></p>
 <div class="panel">
 <label for="toolInput">Lernstoff</label>
-<textarea id="toolInput" placeholder="Lernstoff hier eingeben ..."></textarea>
+<textarea id="toolInput" placeholder="Text hier eingeben oder aus deinen Aufzeichnungen übernehmen ..."></textarea>
 <button class="primary" id="runTool">✨ Mit KI erstellen</button>
 </div>
 <div id="toolResult" class="panel" hidden></div>
@@ -145,20 +145,21 @@ const firebaseConfig = {
   measurementId: "G-B848S8YF80"
 };
 
-const RECAPTCHA_KEY = "6LeHCCIuAAAAACp1ImQBMfScdHO4x5P3yxuSQ6i0";
+const RECAPTCHA_ENTERPRISE_SITE_KEY = "6LeHCCIuAAAAACp1ImQBMfScdHO4x5P3yxuSQ6i0";
 const firebaseApp = initializeApp(firebaseConfig);
 
+// App Check: Fehler werden abgefangen, damit die App nicht sofort abbricht.
 try {
   initializeAppCheck(firebaseApp, {
-    provider: new ReCaptchaEnterpriseProvider(RECAPTCHA_KEY),
+    provider: new ReCaptchaEnterpriseProvider(RECAPTCHA_ENTERPRISE_SITE_KEY),
     isTokenAutoRefreshEnabled: true
   });
-} catch(error) {
+} catch (error) {
   console.warn("App Check konnte nicht initialisiert werden:", error);
 }
 
-const ai = getAI(firebaseApp, {backend: new GoogleAIBackend()});
-const model = getGenerativeModel(ai, {model:"gemini-3.8-flash"});
+const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() });
+const model = getGenerativeModel(ai, { model: "gemini-3.8-flash" });
 
 const subjects = [
 ["📖","Deutsch"],["🇬🇧","Englisch"],["🔢","Mathematik"],
