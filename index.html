@@ -642,42 +642,7 @@ async function recognizeText() {
 
 
 
-// TEXTERKENNUNG VERBESSERT
 
-
-
-async function recognizeText() {
-  const progress = document.getElementById("progress");
-  const output = document.getElementById("recognizedText");
-
-  try {
-    progress.textContent = "PaddleOCR wird geladen ...";
-
-    const { PaddleOCR } = await import(
-      "https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm"
-    );
-
-    progress.textContent = "PaddleOCR-Code erfolgreich geladen!";
-
-    const ocr = await PaddleOCR.create({
-      lang: "de",
-      ocrVersion: "PP-OCRv6",
-      ortOptions: {
-        backend: "auto"
-      }
-    });
-
-    progress.textContent =
-      "✅ PaddleOCR und deutsches Modell erfolgreich gestartet!";
-
-    await ocr.dispose();
-
-  } catch (error) {
-    console.error(error);
-    progress.textContent = "❌ PaddleOCR-Fehler: " + error.message;
-    alert("PaddleOCR-Fehler: " + error.message);
-  }
-}
 
 
 
