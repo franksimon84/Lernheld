@@ -17,7 +17,7 @@ header {
   background: #3978c8;
   color: white;
   text-align: center;
-  padding: 27px 15px;
+  padding: 25px 15px;
 }
 header h1 { margin: 0; font-size: 34px; }
 header p { margin-bottom: 0; }
@@ -28,21 +28,24 @@ h2 { color: #315f99; }
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
-.tile {
+.tile, .feature {
   background: white;
+  border: 0;
   border-radius: 17px;
-  padding: 19px 5px;
+  padding: 20px 5px;
   text-align: center;
   box-shadow: 0 3px 12px #00000012;
   font-weight: bold;
   font-size: 14px;
   cursor: pointer;
+  color: #26364a;
 }
-.tile span {
+.tile span, .feature span {
   display: block;
   font-size: 32px;
   margin-bottom: 9px;
 }
+.tile:active, .feature:active { transform: scale(.97); }
 .camera {
   display: block;
   width: 100%;
@@ -62,6 +65,39 @@ h2 { color: #315f99; }
   margin-bottom: 8px;
 }
 input[type=file] { display: none; }
+.back {
+  background: #dceafa;
+  color: #245d9e;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 18px;
+}
+.feature {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 17px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 15px;
+  font-size: 16px;
+}
+.feature span { margin: 0; }
+.feature small {
+  display: block;
+  font-weight: normal;
+  color: #718096;
+  margin-top: 5px;
+}
+#status {
+  margin-top: 15px;
+  text-align: center;
+  color: #315f99;
+}
 footer {
   text-align: center;
   padding: 25px;
@@ -77,46 +113,102 @@ footer {
 </header>
 
 <main>
-  <h2>Hallo, LernHeld! 👋</h2>
-  <p>Was möchtest du heute lernen?</p>
+  <section id="home">
+    <h2>Hallo, LernHeld! 👋</h2>
+    <p>Was möchtest du heute lernen?</p>
 
-  <div class="grid">
-    <div class="tile"><span>📖</span>Deutsch</div>
-    <div class="tile"><span>🇬🇧</span>Englisch</div>
-    <div class="tile"><span>🔢</span>Mathematik</div>
-    <div class="tile"><span>🧬</span>Biologie</div>
-    <div class="tile"><span>🏛️</span>Geschichte</div>
-    <div class="tile"><span>⚡</span>Physik</div>
-    <div class="tile"><span>🧪</span>Chemie</div>
-    <div class="tile"><span>🌍</span>Erdkunde</div>
-    <div class="tile"><span>💼</span>Wirtschaft</div>
-    <div class="tile"><span>⚖️</span>Ethik</div>
-    <div class="tile"><span>🎵</span>Musik</div>
-    <div class="tile"><span>🏫</span>Sozialkunde</div>
-  </div>
+    <div class="grid" id="subjects"></div>
 
-  <label class="camera" for="photo">
-    <span>📸 ＋</span>
-    Neue Heftseite fotografieren
-    <small style="display:block;margin-top:8px;font-weight:normal">
-      Foto aufnehmen oder Bild auswählen
-    </small>
-  </label>
+    <label class="camera" for="photo">
+      <span>📸 ＋</span>
+      Neue Heftseite fotografieren
+      <small style="display:block;margin-top:8px;font-weight:normal">
+        Foto aufnehmen oder Bild auswählen
+      </small>
+    </label>
+    <input type="file" id="photo" accept="image/*" capture="environment">
+    <div id="status"></div>
+  </section>
 
-  <input type="file" id="photo" accept="image/*" capture="environment">
-
-  <div id="status" style="margin-top:15px;text-align:center"></div>
+  <section id="subjectPage" hidden>
+    <button class="back" onclick="goHome()">← Zurück zur Startseite</button>
+    <h2 id="subjectTitle"></h2>
+    <p>Was möchtest du in diesem Fach machen?</p>
+    <div id="features"></div>
+  </section>
 </main>
 
-<footer>
-  LernHeld 1.0 · Gemeinsam stark lernen
-</footer>
+<footer>LernHeld 1.0 · Gemeinsam stark lernen</footer>
 
 <script>
+const subjects = [
+  ["📖","Deutsch"],
+  ["🇬🇧","Englisch"],
+  ["🔢","Mathematik"],
+  ["🧬","Biologie"],
+  ["🏛️","Geschichte"],
+  ["⚡","Physik"],
+  ["🧪","Chemie"],
+  ["🌍","Erdkunde"],
+  ["💼","Wirtschaft"],
+  ["⚖️","Ethik"],
+  ["🎵","Musik"],
+  ["🏫","Sozialkunde"]
+];
+
+const features = [
+  ["📝","Lernzettel","Zusammenfassungen und Lernunterlagen"],
+  ["🎴","Lernkarten","Wissen mit Karteikarten üben"],
+  ["🧠","Mindmaps","Zusammenhänge übersichtlich darstellen"],
+  ["🎯","Quiz","Wissen spielerisch testen"],
+  ["🔊","Vorlesen","Lerninhalte anhören"]
+];
+
+const subjectContainer = document.getElementById("subjects");
+
+subjects.forEach(subject => {
+  const button = document.createElement("button");
+  button.className = "tile";
+  button.innerHTML = `<span>${subject[0]}</span>${subject[1]}`;
+  button.onclick = () => openSubject(subject[0], subject[1]);
+  subjectContainer.appendChild(button);
+});
+
+function openSubject(icon, name) {
+  document.getElementById("home").hidden = true;
+  document.getElementById("subjectPage").hidden = false;
+  document.getElementById("subjectTitle").textContent =
+    icon + " " + name;
+
+  const container = document.getElementById("features");
+  container.innerHTML = "";
+
+  features.forEach(feature => {
+    const button = document.createElement("button");
+    button.className = "feature";
+    button.innerHTML =
+      `<span>${feature[0]}</span>
+       <div>${feature[1]}<small>${feature[2]}</small></div>`;
+    button.onclick = () => {
+      alert(feature[1] + " in " + name +
+        "\n\nDiesen Bereich bauen wir als Nächstes aus.");
+    };
+    container.appendChild(button);
+  });
+
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  document.getElementById("subjectPage").hidden = true;
+  document.getElementById("home").hidden = false;
+  window.scrollTo(0, 0);
+}
+
 document.getElementById("photo").addEventListener("change", function() {
   const status = document.getElementById("status");
   if (this.files.length) {
-    status.textContent = "Foto ausgewählt: " + this.files[0].name;
+    status.textContent = "📷 Foto ausgewählt: " + this.files[0].name;
   }
 });
 </script>
