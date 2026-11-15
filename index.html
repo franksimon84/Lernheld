@@ -1,4 +1,4 @@
-j
+jj
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -651,14 +651,10 @@ async function recognizeText() {
 
 // TEXTERKENNUNG VERBESSERT
 
+
 async function recognizeText() {
   if (photos.length === 0) {
     alert("Bitte zuerst eine Schulbuchseite auswählen.");
-    return;
-  }
-
-  if (typeof Tesseract === "undefined") {
-    alert("Texterkennung konnte nicht geladen werden.");
     return;
   }
 
@@ -666,70 +662,65 @@ async function recognizeText() {
   const progress = document.getElementById("progress");
 
   output.value = "";
+  let ocr = null;
 
   try {
-    progress.textContent = "Texterkennung wird vorbereitet ...";
+    progress.textContent = "PaddleOCR wird geladen ...";
 
-    worker = await Tesseract.createWorker("deu", 1, {
-      logger: message => {
-        if (message.status === "recognizing text") {
-          progress.textContent =
-            "Texterkennung: " +
-            Math.round(message.progress * 100) + " %";
-        }
+    const { PaddleOCR } = await import(
+      "https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm"
+    );
+
+    progress.textContent = "Deutsches Modell wird geladen ...";
+
+    ocr = await PaddleOCR.create({
+      lang: "de",
+      ocrVersion: "PP-OCRv6",
+      ortOptions: {
+        backend: "auto"
       }
     });
 
-    const results = [];
+    const pages = [];
 
     for (let i = 0; i < photos.length; i++) {
       progress.textContent =
-        "Schulbuchseite " + (i + 1) + " wird untersucht ...";
+        "Seite " + (i + 1) + " von " +
+        photos.length + " wird erkannt ...";
 
-      const imageA = await prepareImageForOCR(photos[i].file, 0);
-      const imageB = await prepareImageForOCR(photos[i].file, 1);
-
-      await worker.setParameters({
-        tessedit_pageseg_mode: "3",
-        preserve_interword_spaces: "1",
-        user_defined_dpi: "300"
+      const [result] = await ocr.predict(photos[i].file, {
+        textDetLimitSideLen: 1280,
+        textDetMaxSideLimit: 4000,
+        textDetBoxThresh: 0.4,
+        textRecScoreThresh: 0.0
       });
 
-      const resultA = await worker.recognize(imageA);
+      const lines = result.items.map(item => item.text);
 
-      await worker.setParameters({
-        tessedit_pageseg_mode: "6",
-        preserve_interword_spaces: "1",
-        user_defined_dpi: "300"
-      });
-
-      const resultB = await worker.recognize(imageB);
-
-      const confidenceA = resultA.data.confidence || 0;
-      const confidenceB = resultB.data.confidence || 0;
-
-      const bestResult =
-        confidenceB > confidenceA ? resultB : resultA;
-
-      results.push(
+      pages.push(
         "--- Seite " + (i + 1) + " ---\n\n" +
-        bestResult.data.text.trim()
+        lines.join("\n")
       );
     }
 
-    output.value = results.join("\n\n");
+    output.value = pages.join("\n\n");
 
     progress.textContent =
-      "Texterkennung abgeschlossen. Bitte Text überprüfen.";
+      "✅ PaddleOCR abgeschlossen. Bitte Text überprüfen.";
 
   } catch (error) {
-    console.error(error);
+    console.error("PaddleOCR:", error);
+
     progress.textContent = "Fehler bei der Texterkennung.";
-    alert("Die Texterkennung ist fehlgeschlagen. Bitte erneut versuchen.");
+
+    alert(
+      "PaddleOCR konnte nicht gestartet werden:\n" +
+      error.message
+    );
+
   } finally {
-    if (worker) {
-      await worker.terminate();
-      worker = null;
+    if (ocr) {
+      await ocr.dispose();
     }
   }
 }
