@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#3978c8">
-<title>LernHeld 1.0</title>
+<title>LernHeld 1.1</title>
 <style>
 :root{--blue:#3978c8;--blue-dark:#245d9e;--pale:#e2efff;--bg:#f1f6fc;--ink:#26364a;--muted:#66788d}
 *{box-sizing:border-box}
@@ -35,6 +36,11 @@ input[type=file]{display:none}
 .hint{font-size:13px;color:var(--muted)}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .actions .primary{margin-top:8px}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.choice-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:145px;padding:18px 10px;border:2px solid #c7dcf5;border-radius:16px;background:white;color:var(--blue-dark);font-size:17px;cursor:pointer;box-shadow:0 3px 12px #00000010}
+.choice-card:active{background:var(--pale);transform:scale(.99)}
+.choice-icon{font-size:38px}
+.choice-card small{font-size:12px;color:var(--muted);font-weight:normal;text-align:center}
 .divider{border:0;border-top:1px solid #d7e2ef;margin:18px 0}
 footer{text-align:center;padding:22px;color:#718096;font-size:13px}
 [hidden]{display:none!important}
@@ -44,91 +50,60 @@ button:disabled{opacity:.55;cursor:wait}
 </style>
 </head>
 <body>
-<header>
-<h1>⭐ LernHeld</h1>
-<p>Einfach lernen. Besser verstehen.</p>
-</header>
-
+<header><h1>⭐ LernHeld 1.1</h1><p>Einfach lernen. Besser verstehen.</p></header>
 <main>
 <section id="home">
-<h2>Hallo, LernHeld! 👋</h2>
-<p>Was möchtest du heute lernen?</p>
+<h2>Hallo, LernHeld! 👋</h2><p>Was möchtest du heute lernen?</p>
 <div class="grid" id="subjects"></div>
-<button type="button" class="camera" id="openPhotos">
-<span>📸 ＋</span>Neue Heftseite hinzufügen
-<small>Foto aufnehmen oder Bilder aus der Mediathek auswählen</small>
-</button>
-<h3>Meine Lernzettel</h3>
-<div id="homeSavedSheets"></div>
+<button type="button" class="camera" id="openPhotos"><span>📄 ＋</span>Dokument hinzufügen</button>
+<h3>Meine Lernzettel</h3><div id="homeSavedSheets"></div>
 </section>
-
 <section id="subjectPage" hidden>
-<button class="back" id="subjectBack">← Zurück</button>
-<h2 id="subjectTitle"></h2>
-<p>Was möchtest du in diesem Fach machen?</p>
-<div id="features"></div>
+<button class="back" id="subjectBack">← Zurück</button><h2 id="subjectTitle"></h2><p>Was möchtest du in diesem Fach machen?</p><div id="features"></div>
 </section>
-
 <section id="photoPage" hidden>
-<button class="back" id="photoBack">← Zurück</button>
-<h2>📸 Heftseiten aufnehmen</h2>
+<button class="back" id="photoBack">← Zurück</button><h2>📸 Heftseiten aufnehmen</h2>
 <p>Fotografiere deine Schulaufzeichnungen oder wähle Bilder aus der Galerie.</p>
-<label for="subjectSelect">Schulfach auswählen</label>
-<select id="subjectSelect"></select>
-<div class="actions">
-<button type="button" class="primary" id="takePhoto">📷 Foto aufnehmen</button>
-<button type="button" class="primary secondary" id="choosePhotos">🖼️ Aus Mediathek auswählen</button>
+<label for="subjectSelect">Schulfach auswählen</label><select id="subjectSelect"></select>
+<div class="choice-grid" aria-label="Quelle für deine Heftseite auswählen">
+  <button type="button" class="choice-card" id="takePhoto">
+    <span class="choice-icon">📷</span>
+    <strong>Kamera</strong>
+    <small>Jetzt ein Foto aufnehmen</small>
+  </button>
+  <button type="button" class="choice-card" id="choosePhotos">
+    <span class="choice-icon">🖼️</span>
+    <strong>Mediathek</strong>
+    <small>Vorhandene Bilder auswählen</small>
+  </button>
 </div>
 <input type="file" id="cameraInput" accept="image/*" capture="environment">
 <input type="file" id="photoInput" accept="image/*" multiple>
 <p class="hint">Du kannst mehrere Bilder aus deiner Mediathek auswählen. Bereits hinzugefügte Seiten bleiben erhalten.</p>
-<div id="preview" class="preview"></div>
-<p id="photoStatus" class="hint"></p>
+<div id="preview" class="preview"></div><p id="photoStatus" class="hint"></p>
 <button class="primary" id="aiRecognize">✨ KI-Texterkennung mit Gemini</button>
 <p class="hint">Die KI kann gedruckte und handschriftliche Inhalte aus Fotos lesen. Bitte Ergebnis anschließend kontrollieren.</p>
 <div id="progress" class="status" aria-live="polite"></div>
 <label for="recognizedText"><b>Erkannter Text – hier kannst du ihn bearbeiten</b></label>
 <textarea id="recognizedText" placeholder="Hier erscheint der erkannte Text ..."></textarea>
-<div class="actions">
-<button class="primary secondary" id="copyText">Text kopieren</button>
-<button class="primary" id="manualSheet">📝 Lernzettel bearbeiten</button>
-</div>
+<div class="actions"><button class="primary secondary" id="copyText">Text kopieren</button><button class="primary" id="manualSheet">📝 Lernzettel bearbeiten</button></div>
 <button class="primary" id="autoSheet">✨ LRS-Lernzettel mit KI erstellen</button>
 </section>
-
 <section id="sheetPage" hidden>
-<button class="back" id="sheetBack">← Zurück</button>
-<h2>📝 Mein Lernzettel</h2>
-<label for="sheetTitle">Überschrift</label>
-<input id="sheetTitle" placeholder="Mein Lernthema">
-<label for="sheetSubject">Schulfach</label>
-<select id="sheetSubject"></select>
-<label for="sheetContent">Dein Lerntext</label>
-<textarea id="sheetContent" placeholder="Schreibe hier deinen Lerntext ..."></textarea>
-<div class="actions">
-<button class="primary" id="saveSheet">💾 Lernzettel speichern</button>
-<button class="primary secondary" id="printSheet">🖨️ Drucken / PDF</button>
-</div>
-<hr class="divider">
-<h3>Meine gespeicherten Lernzettel</h3>
-<div id="savedSheets"></div>
+<button class="back" id="sheetBack">← Zurück</button><h2>📝 Mein Lernzettel</h2>
+<label for="sheetTitle">Überschrift</label><input id="sheetTitle" placeholder="Mein Lernthema">
+<label for="sheetSubject">Schulfach</label><select id="sheetSubject"></select>
+<label for="sheetContent">Dein Lerntext</label><textarea id="sheetContent" placeholder="Schreibe hier deinen Lerntext ..."></textarea>
+<div class="actions"><button class="primary" id="saveSheet">💾 Lernzettel speichern</button><button class="primary secondary" id="printSheet">🖨️ Drucken / PDF</button></div>
+<hr class="divider"><h3>Meine gespeicherten Lernzettel</h3><div id="savedSheets"></div>
 </section>
-
 <section id="toolPage" hidden>
-<button class="back" id="toolBack">← Zurück</button>
-<h2 id="toolTitle">Lernwerkzeug</h2>
-<p id="toolDescription"></p>
-<div class="panel">
-<label for="toolInput">Lernstoff</label>
-<textarea id="toolInput" placeholder="Text hier eingeben oder aus deinen Aufzeichnungen übernehmen ..."></textarea>
-<button class="primary" id="runTool">✨ Mit KI erstellen</button>
-</div>
-<div id="toolResult" class="panel" hidden></div>
-<button class="primary secondary" id="useToolResult" hidden>Ergebnis in Lernzettel übernehmen</button>
+<button class="back" id="toolBack">← Zurück</button><h2 id="toolTitle">Lernwerkzeug</h2><p id="toolDescription"></p>
+<div class="panel"><label for="toolInput">Lernstoff</label><textarea id="toolInput" placeholder="Text hier eingeben oder aus deinen Aufzeichnungen übernehmen ..."></textarea><button class="primary" id="runTool">✨ Mit KI erstellen</button></div>
+<div id="toolResult" class="panel" hidden></div><button class="primary secondary" id="useToolResult" hidden>Ergebnis in Lernzettel übernehmen</button>
 </section>
 </main>
-
-<footer>LernHeld 1.0 · Gemeinsam stark lernen</footer>
+<footer>LernHeld 1.1 · Gemeinsam stark lernen</footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -148,537 +123,237 @@ const firebaseConfig = {
 const RECAPTCHA_ENTERPRISE_SITE_KEY = "6LeHCCIuAAAAACp1ImQBMfScdHO4x5P3yxuSQ6i0";
 const firebaseApp = initializeApp(firebaseConfig);
 
-// App Check: Fehler werden abgefangen, damit die App nicht sofort abbricht.
+let appCheckReady = false;
 try {
   initializeAppCheck(firebaseApp, {
     provider: new ReCaptchaEnterpriseProvider(RECAPTCHA_ENTERPRISE_SITE_KEY),
     isTokenAutoRefreshEnabled: true
   });
+  appCheckReady = true;
+  console.info("LernHeld 1.1: App Check wurde initialisiert.");
 } catch (error) {
-  console.warn("App Check konnte nicht initialisiert werden:", error);
+  console.error("LernHeld 1.1: App Check konnte nicht initialisiert werden:", error);
 }
 
 const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() });
 const model = getGenerativeModel(ai, { model: "gemini-3.8-flash" });
 
 const subjects = [
-["📖","Deutsch"],["🇬🇧","Englisch"],["🔢","Mathematik"],
-["🧬","Biologie"],["🏛️","Geschichte"],["⚡","Physik"],
-["🧪","Chemie"],["🌍","Erdkunde"],["💼","Wirtschaft"],
-["⚖️","Ethik"],["🎵","Musik"],["🏫","Sozialkunde"]
+  ["📖","Deutsch"],["🇬🇧","Englisch"],["🔢","Mathematik"],["🧬","Biologie"],
+  ["🏛️","Geschichte"],["⚡","Physik"],["🧪","Chemie"],["🌍","Erdkunde"],
+  ["💼","Wirtschaft"],["⚖️","Ethik"],["🎵","Musik"],["🏫","Sozialkunde"]
 ];
-
-const featureList = [
-["📝","Lernzettel"],["🎴","Lernkarten"],
-["🧠","Mindmaps"],["🎯","Quiz"],["🔊","Vorlesen"]
-];
-
+const featureList = [["📝","Lernzettel"],["🎴","Lernkarten"],["🧠","Mindmaps"],["🎯","Quiz"],["🔊","Vorlesen"]];
 const $ = id => document.getElementById(id);
-let photos = [];
-let currentSubject = "";
-let previousPage = "home";
-let recognizing = false;
-let currentTool = "";
-let toolResultText = "";
+let photos = [], currentSubject = "", previousPage = "home", recognizing = false, currentTool = "", toolResultText = "";
 
 function showPage(id) {
-  ["home","subjectPage","photoPage","sheetPage","toolPage"]
-    .forEach(p => $(p).hidden = p !== id);
+  ["home","subjectPage","photoPage","sheetPage","toolPage"].forEach(p => $(p).hidden = p !== id);
   window.scrollTo(0,0);
 }
-
-function goHome() {
-  previousPage = "home";
-  showPage("home");
-  renderHomeSheets();
-}
-
-function goBack() {
-  showPage(previousPage);
-}
-
-function fillSubjects() {
-  const container = $("subjects");
-  subjects.forEach(([icon,name]) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "tile";
-    const span = document.createElement("span");
-    span.textContent = icon;
-    button.append(span,document.createTextNode(name));
-    button.addEventListener("click",()=>openSubject(icon,name));
-    container.append(button);
-
-    [$("subjectSelect"),$("sheetSubject")].forEach(select => {
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      select.append(option);
-    });
+function goHome(){previousPage="home";showPage("home");renderHomeSheets();}
+function goBack(){showPage(previousPage);}
+function openPhotos(){previousPage="home";showPage("photoPage");}
+function fillSubjects(){
+  const subjectContainer=$("subjects");
+  subjects.forEach(([icon,name])=>{
+    const b=document.createElement("button");b.type="button";b.className="tile";
+    const s=document.createElement("span");s.textContent=icon;b.append(s,document.createTextNode(name));
+    b.addEventListener("click",()=>openSubject(icon,name));subjectContainer.append(b);
+    [$("subjectSelect"),$("sheetSubject")].forEach(sel=>{const o=document.createElement("option");o.value=name;o.textContent=name;sel.append(o);});
   });
 }
-
-function openSubject(icon,name) {
-  currentSubject = name;
-  $("subjectTitle").textContent = icon+" "+name;
-  const container = $("features");
-  container.replaceChildren();
-
-  featureList.forEach(([emoji,label]) => {
-    const button = document.createElement("button");
-    button.className = "feature";
-    button.type = "button";
-    button.textContent = emoji+" "+label;
-    button.addEventListener("click",() => {
-      if(label === "Lernzettel") openEditor("",name);
-      else if(label === "Vorlesen") {
-        const text = getLatestText();
-        if(!text) alert("Bitte öffne zuerst einen Lernzettel oder füge Lernstoff ein.");
-        else speak(text);
-      } else openTool(label,name);
-    });
-    container.append(button);
-  });
-  showPage("subjectPage");
+function openSubject(icon,name){
+  currentSubject=name;$("subjectTitle").textContent=icon+" "+name;
+  const c=$("features");c.replaceChildren();
+  featureList.forEach(([emoji,label])=>{
+    const b=document.createElement("button");b.className="feature";b.type="button";b.textContent=emoji+" "+label;
+    b.addEventListener("click",()=>{
+      if(label==="Lernzettel")openEditor("",name);
+      else if(label==="Vorlesen"){const t=getLatestText();if(!t)alert("Bitte öffne zuerst einen Lernzettel oder füge Lernstoff ein.");else speak(t);}
+      else openTool(label,name);
+    });c.append(b);
+  });showPage("subjectPage");
 }
-
-function openEditor(content="",subject=currentSubject||$("subjectSelect").value||"Deutsch",title="Mein Lernzettel") {
-  previousPage = $("photoPage").hidden ? "subjectPage" : "photoPage";
-  $("sheetTitle").value = title;
-  $("sheetSubject").value = subject;
-  $("sheetContent").value = content;
-  delete $("sheetPage").dataset.editId;
-  showPage("sheetPage");
+function openEditor(content="",subject=currentSubject||$("subjectSelect").value||"Deutsch",title="Mein Lernzettel"){
+  previousPage=$("photoPage").hidden?"subjectPage":"photoPage";
+  $("sheetTitle").value=title;$("sheetSubject").value=subject;$("sheetContent").value=content;
+  delete $("sheetPage").dataset.editId;showPage("sheetPage");
 }
-
-function getLatestText() {
-  return $("recognizedText").value.trim() || $("sheetContent").value.trim();
-}
-
-$("openPhotos").addEventListener("click",() => {
-  previousPage="home";
-  showPage("photoPage");
-});
+function getLatestText(){return $("recognizedText").value.trim()||$("sheetContent").value.trim();}
+$("openPhotos").addEventListener("click",openPhotos);
 $("subjectBack").addEventListener("click",goHome);
 $("photoBack").addEventListener("click",goBack);
 $("sheetBack").addEventListener("click",goBack);
 $("toolBack").addEventListener("click",goBack);
 
-function addSelectedPhotos(event) {
-  for(const file of Array.from(event.target.files||[])) {
-    if(file.type.startsWith("image/")) {
-      photos.push({file,url:URL.createObjectURL(file)});
-    }
-  }
-  event.target.value="";
-  renderPhotos();
+function addSelectedPhotos(e){
+  for(const file of Array.from(e.target.files||[])){if(file.type.startsWith("image/"))photos.push({file,url:URL.createObjectURL(file)});}
+  e.target.value="";renderPhotos();
 }
-
 $("takePhoto").addEventListener("click",()=>$("cameraInput").click());
 $("choosePhotos").addEventListener("click",()=>$("photoInput").click());
 $("cameraInput").addEventListener("change",addSelectedPhotos);
 $("photoInput").addEventListener("change",addSelectedPhotos);
-
-function renderPhotos() {
-  const container=$("preview");
-  container.replaceChildren();
-  photos.forEach((photo,index) => {
-    const card=document.createElement("div");
-    card.className="photo-card";
-    const img=document.createElement("img");
-    img.src=photo.url;
-    img.alt="Schulbuchseite "+(index+1);
-    const button=document.createElement("button");
-    button.textContent="Seite entfernen";
-    button.addEventListener("click",() => {
-      URL.revokeObjectURL(photo.url);
-      photos.splice(index,1);
-      renderPhotos();
-    });
-    card.append(img,button);
-    container.append(card);
+function renderPhotos(){
+  const c=$("preview");c.replaceChildren();
+  photos.forEach((p,i)=>{
+    const card=document.createElement("div");card.className="photo-card";
+    const img=document.createElement("img");img.src=p.url;img.alt="Schulbuchseite "+(i+1);
+    const del=document.createElement("button");del.textContent="Seite entfernen";
+    del.addEventListener("click",()=>{URL.revokeObjectURL(p.url);photos.splice(i,1);renderPhotos();});
+    card.append(img,del);c.append(card);
   });
   $("photoStatus").textContent=photos.length+" Seite(n) ausgewählt.";
 }
-
-async function preparePhoto(file) {
-  const img=new Image();
-  const url=URL.createObjectURL(file);
-  try {
-    img.src=url;
-    await img.decode();
-    const max=1800;
+async function preparePhoto(file){
+  const img=new Image(),url=URL.createObjectURL(file);
+  try{
+    img.src=url;await img.decode();const max=1800;
     const scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
     const canvas=document.createElement("canvas");
-    canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
-    canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
-    const ctx=canvas.getContext("2d");
-    ctx.fillStyle="white";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.filter="grayscale(1) contrast(1.15)";
-    ctx.drawImage(img,0,0,canvas.width,canvas.height);
-    const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",0.88));
-    if(!blob) throw new Error("Foto konnte nicht verarbeitet werden.");
-    return blob;
-  } finally {
-    URL.revokeObjectURL(url);
-  }
+    canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    const ctx=canvas.getContext("2d");ctx.fillStyle="white";ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.filter="grayscale(1) contrast(1.15)";ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    const blob=await new Promise(res=>canvas.toBlob(res,"image/jpeg",0.88));
+    if(!blob)throw new Error("Foto konnte nicht verarbeitet werden.");return blob;
+  }finally{URL.revokeObjectURL(url);}
 }
-
-async function imageToBase64(file) {
+async function imageToBase64(file){
   const blob=await preparePhoto(file);
-  return await new Promise((resolve,reject) => {
-    const reader=new FileReader();
-    reader.onload=()=>resolve(String(reader.result).split(",")[1]);
-    reader.onerror=reject;
-    reader.readAsDataURL(blob);
+  return await new Promise((resolve,reject)=>{
+    const r=new FileReader();r.onload=()=>resolve(String(r.result).split(",")[1]);r.onerror=reject;r.readAsDataURL(blob);
   });
 }
-
-function setBusy(button,on,label) {
+function setBusy(button,on,label){
   button.disabled=on;
-  if(on) {
-    button.dataset.oldText=button.textContent;
-    button.textContent=label||"Bitte warten ...";
-  } else if(button.dataset.oldText) {
-    button.textContent=button.dataset.oldText;
-    delete button.dataset.oldText;
-  }
+  if(on){button.dataset.oldText=button.textContent;button.textContent=label||"Bitte warten ...";}
+  else if(button.dataset.oldText){button.textContent=button.dataset.oldText;delete button.dataset.oldText;}
 }
-
-function explainError(error) {
-  const message=String(error?.message||error);
-  if(/API_KEY_INVALID|api.?key.*invalid/i.test(message)) {
-    return "Der Firebase-API-Schlüssel wird von Google abgelehnt (API_KEY_INVALID). Der Schlüssel muss in den Firebase-/Google-Cloud-Projekteinstellungen geprüft werden. Technische Meldung: "+message;
-  }
-  if(/app.?check|403|attest|token|permission.denied/i.test(message)) {
-    return "Firebase App Check oder eine API-Berechtigung blockiert die Anfrage. Details: "+message;
-  }
-  if(/quota|429|resource.?exhausted/i.test(message)) {
-    return "Das KI-Kontingent ist möglicherweise aufgebraucht. Bitte später erneut versuchen. Details: "+message;
-  }
-  return message;
+function explainError(error){
+  const msg=String(error?.message||error);
+  if(/API_KEY_INVALID|api.?key.*invalid/i.test(msg))
+    return "Der Firebase-API-Schlüssel wird von Google abgelehnt (API_KEY_INVALID). Das lässt sich nicht durch eine Änderung am LernHeld-Code beheben. Der Schlüssel muss in den Firebase-/Google-Cloud-Projekteinstellungen geprüft werden. Technische Meldung: "+msg;
+  if(/app.?check|403|attest|token|permission.denied/i.test(msg))
+    return "Firebase App Check oder eine API-Berechtigung blockiert die Anfrage. Bitte App-Check- und API-Einstellungen prüfen. Details: "+msg;
+  if(/quota|429|resource.?exhausted/i.test(msg))
+    return "Das KI-Kontingent ist möglicherweise aufgebraucht. Bitte später erneut versuchen. Details: "+msg;
+  return msg;
 }
-
-async function recognizeWithGemini() {
-  if(recognizing) return;
-  if(!photos.length) {
-    alert("Bitte zuerst mindestens eine Seite fotografieren oder auswählen.");
-    return;
-  }
-
-  recognizing=true;
-  const button=$("aiRecognize");
-  setBusy(button,true,"Gemini liest die Fotos ...");
-  $("progress").textContent="Die KI untersucht deine Fotos ...";
-
-  try {
-    const parts=[{
-      text:"Lies alle beigefügten Fotos von deutschen Schulbuch- oder Heftseiten sorgfältig aus. Übertrage den sichtbaren Text möglichst wortgetreu und in der richtigen Reihenfolge. Erhalte Überschriften, Absätze, Aufzählungen, Formeln und Aufgaben. Erfinde keine unleserlichen Wörter. Markiere unsichere Stellen als [unleserlich]. Gib ausschließlich den erkannten Text aus. Trenne mehrere Bilder mit einer Zeile --- Seite 1 ---, --- Seite 2 --- usw."
-    }];
-
-    for(let i=0;i<photos.length;i++) {
-      $("progress").textContent=`Foto ${i+1} von ${photos.length} wird vorbereitet ...`;
+async function recognizeWithGemini(){
+  if(recognizing)return;
+  if(!photos.length){alert("Bitte zuerst mindestens eine Seite fotografieren oder aus der Mediathek auswählen.");return;}
+  recognizing=true;const btn=$("aiRecognize");setBusy(btn,true,"Gemini liest die Fotos ...");
+  $("progress").textContent="Die KI untersucht deine Fotos. Das kann je nach Anzahl der Seiten etwas dauern ...";
+  try{
+    const parts=[{text:"Du bist die Texterkennung von LernHeld 1.1. Lies gedruckte Texte UND handschriftliche Schüleraufzeichnungen auf allen beigefügten Fotos. Übertrage den Inhalt möglichst wortgetreu und in der richtigen Leserichtung. Erhalte Überschriften, Absätze, Aufzählungen, Nummerierungen, Tabellen, Formeln, Aufgaben und handschriftliche Ergänzungen. Unterscheide gedruckten Text und Handschrift nicht durch Umschreiben: gib beides vollständig wieder. Korrigiere Rechtschreibung nicht eigenmächtig und fasse nichts zusammen. Erfinde keine Wörter. Wenn ein Wort wirklich nicht lesbar ist, schreibe [unleserlich]; wenn du zwischen zwei Lesarten schwankst, schreibe [unsicher: Lesart A / Lesart B]. Trenne mehrere Fotos deutlich mit --- SEITE 1 --- usw. Gib ausschließlich die Transkription aus."}];
+    for(let i=0;i<photos.length;i++){
+      $("progress").textContent=`Foto ${i+1} von ${photos.length} wird für Gemini vorbereitet ...`;
       parts.push({
-        inlineData:{
-          mimeType:"image/jpeg",
-          data:await imageToBase64(photos[i].file)
+        type: "inlineData",
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: await imageToBase64(photos[i].file)
         }
       });
     }
-
     $("progress").textContent="Gemini erkennt den Text ...";
-    const result=await model.generateContent(parts);
-    const text=result.response.text();
-
-    if(!text?.trim()) throw new Error("Die KI hat keinen Text zurückgegeben.");
-
-    $("recognizedText").value=text.trim();
-    $("progress").textContent="✅ KI-Texterkennung abgeschlossen. Bitte den Text kontrollieren.";
-  } catch(error) {
-    console.error(error);
-    $("progress").textContent="❌ KI-Texterkennung fehlgeschlagen: "+explainError(error);
-    alert("Die KI-Texterkennung konnte nicht abgeschlossen werden.\n\n"+explainError(error));
-  } finally {
-    recognizing=false;
-    setBusy(button,false);
-  }
+    const result=await model.generateContent(parts);const text=result.response.text();
+    if(!text?.trim())throw new Error("Die KI hat keinen Text zurückgegeben.");
+    $("recognizedText").value=text.trim();$("progress").textContent="✅ KI-Texterkennung abgeschlossen. Bitte den Text kurz kontrollieren.";
+  }catch(err){
+    console.error(err);$("progress").textContent="❌ KI-Texterkennung fehlgeschlagen: "+explainError(err);
+    alert("Die KI-Texterkennung konnte nicht abgeschlossen werden.\n\n"+explainError(err));
+  }finally{recognizing=false;setBusy(btn,false);}
 }
-
 $("aiRecognize").addEventListener("click",recognizeWithGemini);
-
-$("copyText").addEventListener("click",async() => {
-  const text=$("recognizedText").value;
-  if(!text.trim()) {
-    alert("Es gibt noch keinen Text.");
-    return;
-  }
-  try {
-    await navigator.clipboard.writeText(text);
-    alert("Text wurde kopiert!");
-  } catch {
-    alert("Bitte Text markieren und manuell kopieren.");
-  }
+$("copyText").addEventListener("click",async()=>{
+  const t=$("recognizedText").value;if(!t.trim()){alert("Es gibt noch keinen Text.");return;}
+  try{await navigator.clipboard.writeText(t);alert("Text wurde kopiert!");}catch{alert("Bitte Text markieren und manuell kopieren.");}
 });
-
-$("manualSheet").addEventListener("click",() => {
-  const text=$("recognizedText").value.trim();
-  if(!text) {
-    alert("Bitte zuerst Text erkennen lassen.");
-    return;
-  }
-  openEditor(text,$("subjectSelect").value,"Mein Lernzettel");
+$("manualSheet").addEventListener("click",()=>{
+  const t=$("recognizedText").value.trim();if(!t){alert("Bitte zuerst Text erkennen lassen.");return;}
+  openEditor(t,$("subjectSelect").value,"Mein Lernzettel");
 });
-
-async function askAI(prompt) {
-  const result=await model.generateContent(prompt);
-  const text=result.response.text();
-  if(!text?.trim()) throw new Error("Keine Antwort von Gemini erhalten.");
-  return text.trim();
-}
-
-$("autoSheet").addEventListener("click",async() => {
-  const text=$("recognizedText").value.trim();
-  if(!text) {
-    alert("Bitte zuerst Text erkennen lassen.");
-    return;
-  }
-
-  const button=$("autoSheet");
-  setBusy(button,true,"Lernzettel wird erstellt ...");
+$("autoSheet").addEventListener("click",async()=>{
+  const text=$("recognizedText").value.trim();if(!text){alert("Bitte zuerst Text erkennen lassen.");return;}
+  const btn=$("autoSheet");setBusy(btn,true,"Lernzettel wird erstellt ...");
   $("progress").textContent="Gemini erstellt einen leicht verständlichen Lernzettel ...";
-
-  try {
-    const output=await askAI(
-      "Erstelle aus dem folgenden Schulstoff einen LRS-freundlichen Lernzettel auf Deutsch. Verwende kurze, einfache Sätze, klare Überschriften, gut verständliche Erklärungen, Stichpunkte und wichtige Begriffe mit kurzen Definitionen. Lass fachlich wichtige Inhalte nicht weg und erfinde nichts. Erkläre schwierige Wörter. Beende mit 5 kurzen Kontrollfragen samt Antworten. Schulfach: "+
-      $("subjectSelect").value+"\n\nOriginaltext:\n"+text
-    );
-    openEditor(output,$("subjectSelect").value,"Lernzettel – "+$("subjectSelect").value);
-    $("progress").textContent="✅ Dein Lernzettel wurde erstellt.";
-  } catch(error) {
-    alert("KI-Lernzettel konnte nicht erstellt werden:\n"+explainError(error));
-  } finally {
-    setBusy(button,false);
-  }
+  try{
+    const out=await askAI("Erstelle aus dem folgenden Schulstoff einen LRS-freundlichen Lernzettel auf Deutsch. Verwende kurze, einfache Sätze, klare Überschriften, gut verständliche Erklärungen, Stichpunkte und wichtige Begriffe mit kurzen Definitionen. Lass fachlich wichtige Inhalte nicht weg und erfinde nichts. Erkläre schwierige Wörter. Beende mit 5 kurzen Kontrollfragen samt Antworten. Schulfach: "+$("subjectSelect").value+"\n\nOriginaltext:\n"+text);
+    openEditor(out,$("subjectSelect").value,"Lernzettel – "+$("subjectSelect").value);
+    $("progress").textContent="✅ Dein Lernzettel wurde erstellt. Du kannst ihn noch bearbeiten.";
+  }catch(err){alert("KI-Lernzettel konnte nicht erstellt werden:\n"+explainError(err));}
+  finally{setBusy(btn,false);}
 });
-
-function openTool(label,subject) {
-  currentTool=label;
-  $("toolTitle").textContent=({
-    "Lernkarten":"🎴 Lernkarten",
-    "Mindmaps":"🧠 Mindmap",
-    "Quiz":"🎯 Quiz"
-  })[label]||label;
-  $("toolDescription").textContent="Erstelle mit Gemini Lernmaterialien für das Fach "+subject+".";
-  $("toolInput").value=getLatestText();
-  $("toolResult").hidden=true;
-  $("useToolResult").hidden=true;
-  toolResultText="";
-  previousPage="subjectPage";
-  showPage("toolPage");
+async function askAI(prompt){
+  const result=await model.generateContent(prompt);const text=result.response.text();
+  if(!text?.trim())throw new Error("Keine Antwort von Gemini erhalten.");return text.trim();
 }
-
-$("runTool").addEventListener("click",async() => {
-  const input=$("toolInput").value.trim();
-  if(!input) {
-    alert("Bitte zuerst Lernstoff eingeben.");
-    return;
-  }
-
-  const button=$("runTool");
-  setBusy(button,true,"Gemini erstellt ...");
-
-  try {
+function openTool(label,subject){
+  currentTool=label;$("toolTitle").textContent=({"Lernkarten":"🎴 Lernkarten","Mindmaps":"🧠 Mindmap","Quiz":"🎯 Quiz"})[label]||label;
+  $("toolDescription").textContent="Erstelle mit Gemini passende Lernmaterialien für das Fach "+subject+".";
+  $("toolInput").value=getLatestText();$("toolResult").hidden=true;$("useToolResult").hidden=true;toolResultText="";
+  previousPage="subjectPage";showPage("toolPage");
+}
+$("runTool").addEventListener("click",async()=>{
+  const input=$("toolInput").value.trim();if(!input){alert("Bitte zuerst Lernstoff eingeben.");return;}
+  const btn=$("runTool");setBusy(btn,true,"Gemini erstellt ...");
+  try{
     let prompt="";
-    if(currentTool==="Lernkarten") {
-      prompt="Erstelle 8 Lernkarten auf Deutsch. Format: Frage: ... / Antwort: ... . Einfache, kurze Formulierungen, nur Informationen aus dem Lernstoff.\n"+input;
-    } else if(currentTool==="Mindmaps") {
-      prompt="Erstelle eine übersichtliche textbasierte Mindmap auf Deutsch. Nutze Einrückungen, Hauptthema, Äste und Unterpunkte.\n"+input;
-    } else {
-      prompt="Erstelle ein Quiz mit 8 Fragen zum Lernstoff. Nutze Multiple Choice (A/B/C) und kurze Antworten. Gib am Ende die Lösungen mit kurzen Erklärungen.\n"+input;
-    }
-
-    toolResultText=await askAI(prompt);
-    $("toolResult").textContent=toolResultText;
-    $("toolResult").hidden=false;
-    $("useToolResult").hidden=false;
-  } catch(error) {
-    alert("Erstellung fehlgeschlagen:\n"+explainError(error));
-  } finally {
-    setBusy(button,false);
-  }
+    if(currentTool==="Lernkarten")prompt="Erstelle 8 Lernkarten auf Deutsch. Format: Frage: ... / Antwort: ... . Einfache, kurze Formulierungen, nur Informationen aus dem Lernstoff. Lernstoff:\n"+input;
+    else if(currentTool==="Mindmaps")prompt="Erstelle eine übersichtliche textbasierte Mindmap auf Deutsch. Nutze Einrückungen, Hauptthema, Äste und Unterpunkte. Lernstoff:\n"+input;
+    else prompt="Erstelle ein Quiz mit 8 Fragen zum Lernstoff. Nutze eine Mischung aus Multiple Choice (A/B/C) und kurzen Antworten. Gib am Ende die Lösungen mit kurzen Erklärungen. Lernstoff:\n"+input;
+    toolResultText=await askAI(prompt);$("toolResult").textContent=toolResultText;$("toolResult").hidden=false;$("useToolResult").hidden=false;
+  }catch(err){alert("Erstellung fehlgeschlagen:\n"+explainError(err));}
+  finally{setBusy(btn,false);}
 });
+$("useToolResult").addEventListener("click",()=>openEditor(toolResultText,currentSubject||$("subjectSelect").value,currentTool+" – Lernmaterial"));
 
-$("useToolResult").addEventListener("click",() => {
-  openEditor(toolResultText,currentSubject||$("subjectSelect").value,currentTool+" – Lernmaterial");
+function getSheets(){try{return JSON.parse(localStorage.getItem("lernheldSheets")||"[]");}catch{return [];}}
+$("saveSheet").addEventListener("click",()=>{
+  const title=$("sheetTitle").value.trim(),content=$("sheetContent").value.trim(),subject=$("sheetSubject").value;
+  if(!title||!content){alert("Bitte Überschrift und Lerntext eingeben.");return;}
+  const sheets=getSheets(),editId=$("sheetPage").dataset.editId;
+  if(editId){const i=sheets.findIndex(s=>String(s.id)===editId);if(i>=0)sheets[i]={...sheets[i],title,subject,content};delete $("sheetPage").dataset.editId;}
+  else sheets.push({id:Date.now(),title,subject,content});
+  try{localStorage.setItem("lernheldSheets",JSON.stringify(sheets));alert("Dein Lernzettel wurde gespeichert!");renderSavedSheets();renderHomeSheets();}
+  catch{alert("Speichern nicht möglich. Der Gerätespeicher ist möglicherweise voll.");}
 });
-
-function getSheets() {
-  try {
-    return JSON.parse(localStorage.getItem("lernheldSheets")||"[]");
-  } catch {
-    return [];
-  }
+function openSavedSheet(sheet){
+  $("sheetTitle").value=sheet.title;$("sheetSubject").value=sheet.subject;$("sheetContent").value=sheet.content;
+  $("sheetPage").dataset.editId=String(sheet.id);previousPage="home";showPage("sheetPage");
 }
-
-$("saveSheet").addEventListener("click",() => {
-  const title=$("sheetTitle").value.trim();
-  const content=$("sheetContent").value.trim();
-  const subject=$("sheetSubject").value;
-
-  if(!title||!content) {
-    alert("Bitte Überschrift und Lerntext eingeben.");
-    return;
-  }
-
-  const sheets=getSheets();
-  const editId=$("sheetPage").dataset.editId;
-
-  if(editId) {
-    const index=sheets.findIndex(s=>String(s.id)===editId);
-    if(index>=0) sheets[index]={...sheets[index],title,subject,content};
-    delete $("sheetPage").dataset.editId;
-  } else {
-    sheets.push({id:Date.now(),title,subject,content});
-  }
-
-  try {
-    localStorage.setItem("lernheldSheets",JSON.stringify(sheets));
-    alert("Dein Lernzettel wurde gespeichert!");
-    renderSavedSheets();
-    renderHomeSheets();
-  } catch {
-    alert("Speichern nicht möglich. Der Gerätespeicher ist möglicherweise voll.");
-  }
-});
-
-function openSavedSheet(sheet) {
-  $("sheetTitle").value=sheet.title;
-  $("sheetSubject").value=sheet.subject;
-  $("sheetContent").value=sheet.content;
-  $("sheetPage").dataset.editId=String(sheet.id);
-  previousPage="home";
-  showPage("sheetPage");
-}
-
-function renderSavedSheets() {
-  const container=$("savedSheets");
-  container.replaceChildren();
-  const sheets=getSheets();
-
-  if(!sheets.length) {
-    container.textContent="Noch keine Lernzettel gespeichert.";
-    return;
-  }
-
-  sheets.forEach(sheet => {
-    const card=document.createElement("div");
-    card.className="saved-item";
-    const heading=document.createElement("strong");
-    heading.textContent="📄 "+sheet.title+" – "+sheet.subject;
-
-    const edit=document.createElement("button");
-    edit.textContent="Öffnen";
-    edit.addEventListener("click",()=>openSavedSheet(sheet));
-
-    const del=document.createElement("button");
-    del.textContent="Löschen";
-    del.addEventListener("click",() => {
-      if(confirm("Diesen Lernzettel wirklich löschen?")) {
-        localStorage.setItem(
-          "lernheldSheets",
-          JSON.stringify(getSheets().filter(x=>x.id!==sheet.id))
-        );
-        renderSavedSheets();
-        renderHomeSheets();
-      }
-    });
-
-    card.append(heading,document.createElement("br"),edit,del);
-    container.append(card);
+function renderSavedSheets(){
+  const c=$("savedSheets");c.replaceChildren();const sheets=getSheets();
+  if(!sheets.length){c.textContent="Noch keine Lernzettel gespeichert.";return;}
+  sheets.forEach(sheet=>{
+    const card=document.createElement("div");card.className="saved-item";
+    const heading=document.createElement("strong");heading.textContent="📄 "+sheet.title+" – "+sheet.subject;
+    const edit=document.createElement("button");edit.textContent="Öffnen";edit.addEventListener("click",()=>openSavedSheet(sheet));
+    const del=document.createElement("button");del.textContent="Löschen";
+    del.addEventListener("click",()=>{if(confirm("Diesen Lernzettel wirklich löschen?")){localStorage.setItem("lernheldSheets",JSON.stringify(getSheets().filter(x=>x.id!==sheet.id)));renderSavedSheets();renderHomeSheets();}});
+    card.append(heading,document.createElement("br"),edit,del);c.append(card);
   });
 }
-
-function renderHomeSheets() {
-  const container=$("homeSavedSheets");
-  container.replaceChildren();
-  const sheets=getSheets();
-
-  if(!sheets.length) {
-    container.textContent="Noch keine Lernzettel vorhanden.";
-    return;
-  }
-
-  sheets.forEach(sheet => {
-    const button=document.createElement("button");
-    button.className="feature";
-    button.textContent="📄 "+sheet.title+" ("+sheet.subject+")";
-    button.addEventListener("click",()=>openSavedSheet(sheet));
-    container.append(button);
-  });
+function renderHomeSheets(){
+  const c=$("homeSavedSheets");c.replaceChildren();const sheets=getSheets();
+  if(!sheets.length){c.textContent="Noch keine Lernzettel vorhanden.";return;}
+  sheets.forEach(sheet=>{const b=document.createElement("button");b.className="feature";b.textContent="📄 "+sheet.title+" ("+sheet.subject+")";b.addEventListener("click",()=>openSavedSheet(sheet));c.append(b);});
 }
-
-$("printSheet").addEventListener("click",() => {
-  const title=$("sheetTitle").value.trim();
-  const subject=$("sheetSubject").value;
-  const content=$("sheetContent").value;
-
-  if(!content.trim()) {
-    alert("Bitte zuerst einen Lerntext eingeben.");
-    return;
-  }
-
-  const win=window.open("","_blank");
-  if(!win) {
-    alert("Bitte erlaube das Öffnen des Druckfensters.");
-    return;
-  }
-
-  const safe=value=>value.replace(/[&<>"']/g,char=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[char]));
-
-  win.document.write(`
-    <!doctype html>
-    <html lang="de">
-    <head>
-    <meta charset="utf-8">
-    <title>${safe(title)}</title>
-    <style>
-    body{font-family:Arial;padding:28px;line-height:1.7;font-size:17px}
-    h1{color:#315f99}
-    .content{white-space:pre-wrap}
-    </style>
-    </head>
-    <body>
-    <h1>${safe(title)}</h1>
-    <p><b>Schulfach:</b> ${safe(subject)}</p>
-    <hr>
-    <div class="content">${safe(content)}</div>
-    </body>
-    </html>
-  `);
-
-  win.document.close();
-  win.focus();
-  setTimeout(()=>win.print(),400);
+$("printSheet").addEventListener("click",()=>{
+  const title=$("sheetTitle").value.trim(),subject=$("sheetSubject").value,content=$("sheetContent").value;
+  if(!content.trim()){alert("Bitte zuerst einen Lerntext eingeben.");return;}
+  const w=window.open("","_blank");if(!w){alert("Bitte erlaube das Öffnen des Druckfensters.");return;}
+  const safe=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  w.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>${safe(title)}</title><style>body{font-family:Arial;padding:28px;line-height:1.7;font-size:17px}h1{color:#315f99}.content{white-space:pre-wrap}</style></head><body><h1>${safe(title)}</h1><p><b>Schulfach:</b> ${safe(subject)}</p><hr><div class="content">${safe(content)}</div></body></html>`);
+  w.document.close();w.focus();setTimeout(()=>w.print(),400);
 });
-
-function speak(text) {
-  if(!("speechSynthesis" in window)) {
-    alert("Vorlesen wird von diesem Browser nicht unterstützt.");
-    return;
-  }
-  speechSynthesis.cancel();
-  const utterance=new SpeechSynthesisUtterance(text);
-  utterance.lang="de-DE";
-  utterance.rate=0.88;
-  speechSynthesis.speak(utterance);
+function speak(text){
+  if(!("speechSynthesis"in window)){alert("Vorlesen wird von diesem Browser nicht unterstützt.");return;}
+  speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(text);utterance.lang="de-DE";utterance.rate=0.88;speechSynthesis.speak(utterance);
 }
-
-fillSubjects();
-renderHomeSheets();
-renderSavedSheets();
+fillSubjects();renderHomeSheets();renderSavedSheets();
 </script>
 </body>
 </html>
