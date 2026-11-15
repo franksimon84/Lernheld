@@ -469,10 +469,7 @@ async function getOcrEngine() {
       lang: "de",
       ocrVersion: "PP-OCRv6",
       ortOptions: {
-        backend: "wasm",
-        wasmPaths: "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/",
-        numThreads: 1,
-        simd: true
+        backend: "auto"
       }
     });
 
