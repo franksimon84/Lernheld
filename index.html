@@ -1,4 +1,4 @@
-
+j
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -567,37 +567,87 @@ function renderPhotos() {
 // BILD VERBESSERN
 
 
-async function prepareImageForOCR(file, mode = 0) {
-  const image = new Image();
-  const url = URL.createObjectURL(file);
+
+// PADDLEOCR – NEUE DEUTSCHE TEXTERKENNUNG
+
+async function recognizeText() {
+
+  if (photos.length === 0) {
+    alert("Bitte zuerst eine Schulbuchseite auswählen.");
+    return;
+  }
+
+  const output = document.getElementById("recognizedText");
+  const progress = document.getElementById("progress");
+
+  output.value = "";
+
+  let ocr = null;
 
   try {
-    image.src = url;
-    await image.decode();
+    progress.textContent =
+      "PaddleOCR wird geladen. Beim ersten Start kann das etwas dauern ...";
 
-    const maxWidth = 3200;
-    const scale = Math.min(2, maxWidth / image.naturalWidth);
+    const { PaddleOCR } = await import(
+      "https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm"
+    );
 
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(image.naturalWidth * scale);
-    canvas.height = Math.round(image.naturalHeight * scale);
+    progress.textContent =
+      "Deutsches Erkennungsmodell wird vorbereitet ...";
 
-    const ctx = canvas.getContext("2d", {
-      willReadFrequently: true
+    ocr = await PaddleOCR.create({
+      lang: "german",
+      ocrVersion: "PP-OCRv6",
+      ortOptions: {
+        backend: "wasm"
+      }
     });
 
-    ctx.filter = mode === 0
-      ? "grayscale(1) contrast(1.5) brightness(1.08)"
-      : "grayscale(1) contrast(1.8) brightness(1.15)";
+    const results = [];
 
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    ctx.filter = "none";
+    for (let i = 0; i < photos.length; i++) {
 
-    return canvas;
+      progress.textContent =
+        "Schulbuchseite " + (i + 1) +
+        " von " + photos.length + " wird erkannt ...";
+
+      const result = await ocr.predict(photos[i].file);
+
+      const text = result[0].items
+        .map(item => item.text)
+        .join("\n");
+
+      results.push(
+        "--- Seite " + (i + 1) + " ---\n\n" + text
+      );
+    }
+
+    output.value = results.join("\n\n");
+
+    progress.textContent =
+      "✅ PaddleOCR abgeschlossen. Bitte Text überprüfen.";
+
+  } catch (error) {
+
+    console.error("PaddleOCR Fehler:", error);
+
+    progress.textContent =
+      "Fehler beim Laden oder Erkennen.";
+
+    alert(
+      "PaddleOCR konnte nicht gestartet werden. " +
+      "Bitte Internetverbindung prüfen und erneut versuchen."
+    );
+
   } finally {
-    URL.revokeObjectURL(url);
+
+    if (ocr) {
+      await ocr.dispose();
+    }
+
   }
 }
+
 
 // TEXTERKENNUNG VERBESSERT
 
