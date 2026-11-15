@@ -652,17 +652,10 @@ async function recognizeText() {
 // TEXTERKENNUNG VERBESSERT
 
 
+
 async function recognizeText() {
-  if (photos.length === 0) {
-    alert("Bitte zuerst eine Schulbuchseite auswählen.");
-    return;
-  }
-
-  const output = document.getElementById("recognizedText");
   const progress = document.getElementById("progress");
-
-  output.value = "";
-  let ocr = null;
+  const output = document.getElementById("recognizedText");
 
   try {
     progress.textContent = "PaddleOCR wird geladen ...";
@@ -671,9 +664,9 @@ async function recognizeText() {
       "https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm"
     );
 
-    progress.textContent = "Deutsches Modell wird geladen ...";
+    progress.textContent = "PaddleOCR-Code erfolgreich geladen!";
 
-    ocr = await PaddleOCR.create({
+    const ocr = await PaddleOCR.create({
       lang: "de",
       ocrVersion: "PP-OCRv6",
       ortOptions: {
@@ -681,49 +674,18 @@ async function recognizeText() {
       }
     });
 
-    const pages = [];
-
-    for (let i = 0; i < photos.length; i++) {
-      progress.textContent =
-        "Seite " + (i + 1) + " von " +
-        photos.length + " wird erkannt ...";
-
-      const [result] = await ocr.predict(photos[i].file, {
-        textDetLimitSideLen: 1280,
-        textDetMaxSideLimit: 4000,
-        textDetBoxThresh: 0.4,
-        textRecScoreThresh: 0.0
-      });
-
-      const lines = result.items.map(item => item.text);
-
-      pages.push(
-        "--- Seite " + (i + 1) + " ---\n\n" +
-        lines.join("\n")
-      );
-    }
-
-    output.value = pages.join("\n\n");
-
     progress.textContent =
-      "✅ PaddleOCR abgeschlossen. Bitte Text überprüfen.";
+      "✅ PaddleOCR und deutsches Modell erfolgreich gestartet!";
+
+    await ocr.dispose();
 
   } catch (error) {
-    console.error("PaddleOCR:", error);
-
-    progress.textContent = "Fehler bei der Texterkennung.";
-
-    alert(
-      "PaddleOCR konnte nicht gestartet werden:\n" +
-      error.message
-    );
-
-  } finally {
-    if (ocr) {
-      await ocr.dispose();
-    }
+    console.error(error);
+    progress.textContent = "❌ PaddleOCR-Fehler: " + error.message;
+    alert("PaddleOCR-Fehler: " + error.message);
   }
 }
+
 
 
 
