@@ -7,15 +7,13 @@
 <meta name="theme-color" content="#3978c8">
 <title>LernHeld 1.0</title>
 <style>
-:root{--blue:#3978c8;--blue-dark:#245d9e;--pale:#e2efff;--bg:#f1f6fc;--ink:#26364a;--muted:#66788d;--white:#fff;--line:#d7e2ef;--green:#16845b;--red:#b33b3b}
+:root{--blue:#3978c8;--blue-dark:#245d9e;--pale:#e2efff;--bg:#f1f6fc;--ink:#26364a;--muted:#66788d}
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
 header{background:var(--blue);color:white;text-align:center;padding:22px 15px}
 header h1{margin:0;font-size:32px}
-header p{margin:6px 0 0}
 main{max-width:850px;margin:auto;padding:18px 16px 40px}
 h2,h3{color:#315f99}
-h2{margin-top:8px}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
 .tile,.feature{background:white;border:0;border-radius:15px;padding:17px 6px;text-align:center;box-shadow:0 3px 12px #00000012;font-weight:bold;cursor:pointer;color:var(--ink);font-size:15px}
 .tile span{display:block;font-size:29px;margin-bottom:6px}
@@ -31,25 +29,19 @@ input[type=file]{display:none}
 .preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
 .photo-card{background:white;padding:7px;border-radius:12px;min-width:0}
 .photo-card img{width:100%;height:150px;object-fit:contain}
-.photo-card button,.saved-item button,.small-button{padding:8px 11px;border:0;border-radius:8px;margin:5px 5px 0 0;background:var(--pale);color:var(--blue-dark);cursor:pointer}
+.photo-card button,.saved-item button{padding:8px 11px;border:0;border-radius:8px;margin:5px;background:var(--pale);color:var(--blue-dark);cursor:pointer}
 .photo-card button{width:100%;background:#fce7e7;color:#933}
 .status{margin:12px 0;color:var(--blue-dark);font-weight:bold;overflow-wrap:anywhere;white-space:pre-wrap}
 .saved-item,.panel{background:white;padding:15px;margin:10px 0;border-radius:12px;box-shadow:0 2px 8px #00000010}
-.saved-item button{margin-top:10px}
 .hint{font-size:13px;color:var(--muted)}
-.tag{display:inline-block;background:#eaf3ff;color:#245d9e;border-radius:20px;padding:4px 9px;font-size:12px;font-weight:bold}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .actions .primary{margin-top:8px}
-.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.feature-grid button{margin:0}
-.divider{border:0;border-top:1px solid var(--line);margin:18px 0}
-.busy{opacity:.65;pointer-events:none}
+.divider{border:0;border-top:1px solid #d7e2ef;margin:18px 0}
 footer{text-align:center;padding:22px;color:#718096;font-size:13px}
 [hidden]{display:none!important}
 button:disabled{opacity:.55;cursor:wait}
-button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #91bfff;outline-offset:2px}
-@media(max-width:440px){.grid{gap:7px}.tile{font-size:12px;padding:13px 3px}.tile span{font-size:26px}.preview{grid-template-columns:1fr 1fr}.actions,.feature-grid{grid-template-columns:1fr}}
-@media print{header,footer,button,.back{display:none!important}body{background:white}main{max-width:none;padding:0}.print-content{white-space:pre-wrap}}
+@media(max-width:440px){.grid{gap:7px}.tile{font-size:12px;padding:13px 3px}.tile span{font-size:26px}.preview{grid-template-columns:1fr 1fr}.actions{grid-template-columns:1fr}}
+@media print{header,footer,button,.back{display:none!important}body{background:white}main{max-width:none;padding:0}}
 </style>
 </head>
 <body>
@@ -68,8 +60,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 
 <button type="button" class="camera" id="openPhotos">
 <span>📸 ＋</span>
-Neue Heftseite fotografieren
-<small>Foto aufnehmen oder aus der Galerie wählen</small>
+Neue Heftseite hinzufügen
+<small>Foto aufnehmen oder Bilder aus der Mediathek auswählen</small>
 </button>
 
 <h3>Meine Lernzettel</h3>
@@ -91,13 +83,15 @@ Neue Heftseite fotografieren
 <label for="subjectSelect">Schulfach auswählen</label>
 <select id="subjectSelect"></select>
 
-<label class="camera" for="photoInput">
-<span>📷 ＋</span>
-Fotos hinzufügen
-<small>Mehrere Seiten auswählen</small>
-</label>
+<div class="actions">
+<button type="button" class="primary" id="takePhoto">📷 Foto aufnehmen</button>
+<button type="button" class="primary secondary" id="choosePhotos">🖼️ Aus Mediathek auswählen</button>
+</div>
 
-<input type="file" id="photoInput" accept="image/*" capture="environment" multiple>
+<input type="file" id="cameraInput" accept="image/*" capture="environment">
+<input type="file" id="photoInput" accept="image/*" multiple>
+
+<p class="hint">Du kannst mehrere Bilder aus deiner Mediathek auswählen. Bereits hinzugefügte Seiten bleiben erhalten.</p>
 
 <div id="preview" class="preview"></div>
 <p id="photoStatus" class="hint"></p>
@@ -371,9 +365,9 @@ $("photoBack").addEventListener("click",goBack);
 $("sheetBack").addEventListener("click",goBack);
 $("toolBack").addEventListener("click",goBack);
 
-// FOTOS LADEN
+// BILDER AUS KAMERA UND MEDIATHEK
 
-$("photoInput").addEventListener("change",e => {
+function addSelectedPhotos(e) {
 
 for(const file of Array.from(e.target.files || [])) {
 
@@ -389,7 +383,26 @@ url:URL.createObjectURL(file)
 e.target.value = "";
 renderPhotos();
 
+}
+
+// KAMERA ÖFFNEN
+
+$("takePhoto").addEventListener("click",() => {
+$("cameraInput").click();
 });
+
+// MEDIATHEK ÖFFNEN
+
+$("choosePhotos").addEventListener("click",() => {
+$("photoInput").click();
+});
+
+// BEIDE BILDQUELLEN VERARBEITEN
+
+$("cameraInput").addEventListener("change",addSelectedPhotos);
+$("photoInput").addEventListener("change",addSelectedPhotos);
+
+// BILDER ANZEIGEN
 
 function renderPhotos() {
 
@@ -419,11 +432,12 @@ c.append(card);
 
 });
 
-$("photoStatus").textContent = photos.length+" Seite(n) ausgewählt.";
+$("photoStatus").textContent =
+photos.length+" Seite(n) ausgewählt.";
 
 }
 
-// FOTOS AUFBEREITEN
+// FOTO AUFBEREITEN
 
 async function preparePhoto(file) {
 
@@ -451,9 +465,13 @@ ctx.fillRect(0,0,canvas.width,canvas.height);
 ctx.filter = "grayscale(1) contrast(1.15)";
 ctx.drawImage(img,0,0,canvas.width,canvas.height);
 
-const blob = await new Promise(res => canvas.toBlob(res,"image/jpeg",0.88));
+const blob = await new Promise(res =>
+canvas.toBlob(res,"image/jpeg",0.88)
+);
 
-if(!blob) throw new Error("Foto konnte nicht verarbeitet werden.");
+if(!blob) {
+throw new Error("Foto konnte nicht verarbeitet werden.");
+}
 
 return blob;
 
@@ -463,6 +481,8 @@ URL.revokeObjectURL(url);
 }
 
 }
+
+// FOTO IN BASE64 UMWANDELN
 
 async function imageToBase64(file) {
 
@@ -481,7 +501,7 @@ r.readAsDataURL(blob);
 
 }
 
-// STATUSANZEIGE
+// STATUS UND FEHLER
 
 function setBusy(button,on,label) {
 
@@ -503,11 +523,11 @@ function explainError(error) {
 const msg = String(error?.message || error);
 
 if(/app.?check|403|attest|token/i.test(msg)) {
-return "Firebase App Check blockiert die Anfrage. Bitte prüfen wir die App-Check-Einrichtung für die Web-App. Details: "+msg;
+return "Firebase App Check blockiert die Anfrage. Bitte prüfen wir die App-Check-Einrichtung. Details: "+msg;
 }
 
 if(/quota|429|resource.?exhausted/i.test(msg)) {
-return "Das kostenlose KI-Kontingent ist möglicherweise aufgebraucht. Bitte später erneut versuchen. Details: "+msg;
+return "Das KI-Kontingent ist möglicherweise aufgebraucht. Bitte später erneut versuchen. Details: "+msg;
 }
 
 return msg;
@@ -521,7 +541,7 @@ async function recognizeWithGemini() {
 if(recognizing) return;
 
 if(!photos.length) {
-alert("Bitte zuerst mindestens eine Seite fotografieren oder auswählen.");
+alert("Bitte zuerst mindestens eine Seite fotografieren oder aus der Mediathek auswählen.");
 return;
 }
 
@@ -531,7 +551,8 @@ const btn = $("aiRecognize");
 
 setBusy(btn,true,"Gemini liest die Fotos ...");
 
-$("progress").textContent = "Die KI untersucht deine Fotos. Das kann je nach Anzahl der Seiten etwas dauern ...";
+$("progress").textContent =
+"Die KI untersucht deine Fotos. Das kann je nach Anzahl der Seiten etwas dauern ...";
 
 try {
 
@@ -541,7 +562,8 @@ text:"Lies alle beigefügten Fotos von deutschen Schulbuch- oder Heftseiten sorg
 
 for(let i=0;i<photos.length;i++) {
 
-$("progress").textContent = `Foto ${i+1} von ${photos.length} wird für Gemini vorbereitet ...`;
+$("progress").textContent =
+`Foto ${i+1} von ${photos.length} wird für Gemini vorbereitet ...`;
 
 const data = await imageToBase64(photos[i].file);
 
@@ -566,14 +588,16 @@ throw new Error("Die KI hat keinen Text zurückgegeben.");
 
 $("recognizedText").value = text.trim();
 
-$("progress").textContent = "✅ KI-Texterkennung abgeschlossen. Bitte den Text kurz kontrollieren.";
+$("progress").textContent =
+"✅ KI-Texterkennung abgeschlossen. Bitte den Text kurz kontrollieren.";
 
 }
 catch(err) {
 
 console.error(err);
 
-$("progress").textContent = "❌ KI-Texterkennung fehlgeschlagen: "+explainError(err);
+$("progress").textContent =
+"❌ KI-Texterkennung fehlgeschlagen: "+explainError(err);
 
 alert("Die KI-Texterkennung konnte nicht abgeschlossen werden.\n\n"+explainError(err));
 
@@ -627,7 +651,7 @@ openEditor(t,$("subjectSelect").value,"Mein Lernzettel");
 
 });
 
-// KI LERNZETTEL
+// LRS-LERNZETTEL ERSTELLEN
 
 $("autoSheet").addEventListener("click",async() => {
 
@@ -642,7 +666,8 @@ const btn = $("autoSheet");
 
 setBusy(btn,true,"Lernzettel wird erstellt ...");
 
-$("progress").textContent = "Gemini erstellt einen leicht verständlichen Lernzettel ...";
+$("progress").textContent =
+"Gemini erstellt einen leicht verständlichen Lernzettel ...";
 
 try {
 
@@ -655,7 +680,8 @@ text
 
 openEditor(out,$("subjectSelect").value,"Lernzettel – "+$("subjectSelect").value);
 
-$("progress").textContent = "✅ Dein Lernzettel wurde erstellt. Du kannst ihn noch bearbeiten.";
+$("progress").textContent =
+"✅ Dein Lernzettel wurde erstellt. Du kannst ihn noch bearbeiten.";
 
 }
 catch(err) {
@@ -671,7 +697,7 @@ setBusy(btn,false);
 
 });
 
-// GEMINI FUNKTION
+// GEMINI TEXTFUNKTION
 
 async function askAI(prompt) {
 
@@ -699,7 +725,8 @@ $("toolTitle").textContent = ({
 "Quiz":"🎯 Quiz"
 })[label] || label;
 
-$("toolDescription").textContent = "Erstelle mit Gemini passende Lernmaterialien für das Fach "+subject+".";
+$("toolDescription").textContent =
+"Erstelle mit Gemini passende Lernmaterialien für das Fach "+subject+".";
 
 $("toolInput").value = getLatestText();
 
@@ -778,7 +805,7 @@ currentTool+" – Lernmaterial"
 
 });
 
-// SPEICHERN
+// LERNZETTEL SPEICHERN
 
 function getSheets() {
 
