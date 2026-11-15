@@ -7,137 +7,37 @@
 <title>LernHeld</title>
 <style>
 * { box-sizing:border-box; }
-body {
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f1f6fc;
-  color:#26364a;
-}
-header {
-  background:#3978c8;
-  color:white;
-  text-align:center;
-  padding:25px 15px;
-}
+body { margin:0; font-family:Arial,sans-serif; background:#f1f6fc; color:#26364a; }
+header { background:#3978c8; color:white; text-align:center; padding:25px; }
 header h1 { margin:0; font-size:34px; }
 main { max-width:750px; margin:auto; padding:20px; }
 h2 { color:#315f99; }
-.grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-}
+.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
 .tile,.feature {
-  background:white;
-  border:0;
-  border-radius:17px;
-  padding:19px 5px;
-  text-align:center;
-  box-shadow:0 3px 12px #00000012;
-  font-weight:bold;
-  font-size:14px;
-  cursor:pointer;
-  color:#26364a;
+ background:white; border:0; border-radius:16px; padding:18px 5px;
+ text-align:center; box-shadow:0 3px 12px #00000012;
+ font-weight:bold; cursor:pointer; color:#26364a;
 }
-.tile span {
-  display:block;
-  font-size:32px;
-  margin-bottom:9px;
-}
+.tile span { display:block; font-size:30px; margin-bottom:8px; }
 .camera,.primary {
-  display:block;
-  width:100%;
-  margin-top:20px;
-  padding:20px;
-  border:0;
-  border-radius:17px;
-  background:#3978c8;
-  color:white;
-  font-size:17px;
-  font-weight:bold;
-  cursor:pointer;
-  text-align:center;
+ display:block; width:100%; margin-top:16px; padding:19px;
+ border:0; border-radius:16px; background:#3978c8;
+ color:white; font-size:17px; font-weight:bold; cursor:pointer;
 }
-.camera {
-  background:#e2efff;
-  color:#245d9e;
-  border:2px dashed #3978c8;
-}
-.camera span {
-  display:block;
-  font-size:38px;
-  margin-bottom:8px;
-}
-.back {
-  background:#dceafa;
-  color:#245d9e;
-  border:0;
-  border-radius:12px;
-  padding:12px 18px;
-  font-size:16px;
-  font-weight:bold;
-  margin-bottom:18px;
-}
-.feature {
-  width:100%;
-  margin-bottom:12px;
-  padding:17px;
-  display:flex;
-  align-items:center;
-  text-align:left;
-  gap:15px;
-  font-size:16px;
-}
-.feature span { font-size:30px; }
-.feature small {
-  display:block;
-  font-weight:normal;
-  color:#718096;
-  margin-top:5px;
-}
-select {
-  width:100%;
-  padding:14px;
-  border:1px solid #ccd8e7;
-  border-radius:12px;
-  background:white;
-  font-size:16px;
-  margin:10px 0 18px;
-}
+.camera { background:#e2efff; color:#245d9e; border:2px dashed #3978c8; }
+.camera span { display:block; font-size:35px; margin-bottom:8px; }
+.back { padding:12px 18px; border:0; border-radius:10px; background:#dceafa; color:#245d9e; margin-bottom:15px; }
+.feature { width:100%; display:block; text-align:left; padding:17px; margin-bottom:10px; font-size:16px; }
+select,textarea { width:100%; padding:13px; border:1px solid #ccd8e7; border-radius:10px; font-size:16px; background:white; }
+textarea { min-height:220px; resize:vertical; line-height:1.6; }
 input[type=file] { display:none; }
-.preview {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-  margin-top:15px;
-}
-.preview img {
-  width:100%;
-  height:180px;
-  object-fit:contain;
-  background:white;
-  border-radius:12px;
-}
-.photo-card {
-  background:white;
-  padding:8px;
-  border-radius:14px;
-  box-shadow:0 2px 8px #00000012;
-}
-.photo-card button {
-  width:100%;
-  border:0;
-  padding:9px;
-  margin-top:5px;
-  background:#fce7e7;
-  color:#a33;
-  border-radius:8px;
-}
-footer {
-  text-align:center;
-  padding:25px;
-  color:#718096;
-}
+.preview { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:15px 0; }
+.preview img { width:100%; height:150px; object-fit:contain; background:white; border-radius:10px; }
+.photo-card { background:white; padding:7px; border-radius:12px; }
+.photo-card button { width:100%; padding:8px; border:0; border-radius:8px; background:#fce7e7; color:#a33; margin-top:5px; }
+#progress { margin:12px 0; color:#245d9e; font-weight:bold; }
+footer { text-align:center; padding:25px; color:#718096; }
+[hidden] { display:none !important; }
 </style>
 </head>
 <body>
@@ -148,187 +48,204 @@ footer {
 </header>
 
 <main>
-
 <section id="home">
 <h2>Hallo, LernHeld! 👋</h2>
 <p>Was möchtest du heute lernen?</p>
 <div class="grid" id="subjects"></div>
-
 <button class="camera" onclick="openPhotos()">
-<span>📸 ＋</span>
-Neue Heftseite fotografieren
-<small>Foto aufnehmen oder Bild auswählen</small>
+<span>📸 ＋</span>Neue Heftseite fotografieren
 </button>
 </section>
 
 <section id="subjectPage" hidden>
 <button class="back" onclick="goHome()">← Zurück</button>
 <h2 id="subjectTitle"></h2>
-<p>Was möchtest du in diesem Fach machen?</p>
 <div id="features"></div>
 </section>
 
 <section id="photoPage" hidden>
-<button class="back" onclick="goHome()">← Zurück zur Startseite</button>
+<button class="back" onclick="goHome()">← Zurück</button>
 <h2>📸 Heftseiten aufnehmen</h2>
-<p>Fotografiere deine Schulaufzeichnungen oder wähle Bilder aus deiner Galerie.</p>
-
-<label for="subjectSelect">Zu welchem Schulfach gehören die Seiten?</label>
+<p>Wähle das passende Schulfach:</p>
 <select id="subjectSelect"></select>
 
 <label class="camera" for="photoInput">
-<span>📷 ＋</span>
-Fotos hinzufügen
-<small>Du kannst mehrere Seiten auswählen.</small>
+<span>📷 ＋</span>Fotos hinzufügen
 </label>
-<input type="file" id="photoInput" accept="image/*" capture="environment" multiple>
+<input type="file" id="photoInput" accept="image/*" multiple>
 
-<h3>Deine ausgewählten Seiten</h3>
 <div id="preview" class="preview"></div>
 <p id="photoStatus"></p>
 
-<button class="primary" onclick="preparePages()">
-Lernmaterial vorbereiten
-</button>
-</section>
+<button class="primary" onclick="recognizeText()">🔎 Text erkennen</button>
+<div id="progress"></div>
 
+<h3>Dein erkannter Text</h3>
+<p>Du kannst den Text hier bearbeiten und Fehler korrigieren.</p>
+<textarea id="recognizedText" placeholder="Hier erscheint der erkannte Text ..."></textarea>
+
+<button class="primary" onclick="copyText()">Text kopieren</button>
+</section>
 </main>
 
 <footer>LernHeld 1.0 · Gemeinsam stark lernen</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 <script>
 const subjects = [
-["📖","Deutsch"],["🇬🇧","Englisch"],
-["🔢","Mathematik"],["🧬","Biologie"],
-["🏛️","Geschichte"],["⚡","Physik"],
-["🧪","Chemie"],["🌍","Erdkunde"],
-["💼","Wirtschaft"],["⚖️","Ethik"],
-["🎵","Musik"],["🏫","Sozialkunde"]
+["📖","Deutsch"],["🇬🇧","Englisch"],["🔢","Mathematik"],
+["🧬","Biologie"],["🏛️","Geschichte"],["⚡","Physik"],
+["🧪","Chemie"],["🌍","Erdkunde"],["💼","Wirtschaft"],
+["⚖️","Ethik"],["🎵","Musik"],["🏫","Sozialkunde"]
 ];
 
 const features = [
-["📝","Lernzettel","Zusammenfassungen erstellen"],
-["🎴","Lernkarten","Mit Karteikarten üben"],
-["🧠","Mindmaps","Wissen übersichtlich darstellen"],
-["🎯","Quiz","Wissen spielerisch testen"],
-["🔊","Vorlesen","Lerninhalte anhören"]
+["📝","Lernzettel"],["🎴","Lernkarten"],
+["🧠","Mindmaps"],["🎯","Quiz"],["🔊","Vorlesen"]
 ];
 
-let selectedPhotos = [];
+let photos = [];
 
 const subjectContainer = document.getElementById("subjects");
-
-subjects.forEach(subject => {
-  const button = document.createElement("button");
-  button.className = "tile";
-  button.innerHTML = `<span>${subject[0]}</span>${subject[1]}`;
-  button.onclick = () => openSubject(subject[0],subject[1]);
-  subjectContainer.appendChild(button);
-});
-
 const subjectSelect = document.getElementById("subjectSelect");
 
 subjects.forEach(subject => {
-  const option = document.createElement("option");
-  option.value = subject[1];
-  option.textContent = subject[1];
-  subjectSelect.appendChild(option);
+ const button = document.createElement("button");
+ button.className = "tile";
+ button.innerHTML = `<span>${subject[0]}</span>${subject[1]}`;
+ button.onclick = () => openSubject(subject[0],subject[1]);
+ subjectContainer.appendChild(button);
+
+ const option = document.createElement("option");
+ option.value = subject[1];
+ option.textContent = subject[1];
+ subjectSelect.appendChild(option);
 });
 
 function showPage(id) {
-  ["home","subjectPage","photoPage"].forEach(page => {
-    document.getElementById(page).hidden = page !== id;
-  });
-  window.scrollTo(0,0);
+ ["home","subjectPage","photoPage"].forEach(page => {
+  document.getElementById(page).hidden = page !== id;
+ });
+ window.scrollTo(0,0);
 }
 
+function goHome() { showPage("home"); }
+
 function openSubject(icon,name) {
-  showPage("subjectPage");
-  document.getElementById("subjectTitle").textContent =
-    icon+" "+name;
+ showPage("subjectPage");
+ document.getElementById("subjectTitle").textContent = icon+" "+name;
+ const container = document.getElementById("features");
+ container.innerHTML = "";
 
-  const container = document.getElementById("features");
-  container.innerHTML = "";
-
-  features.forEach(feature => {
-    const button = document.createElement("button");
-    button.className = "feature";
-    button.innerHTML =
-      `<span>${feature[0]}</span>
-       <div>${feature[1]}<small>${feature[2]}</small></div>`;
-    button.onclick = () =>
-      alert(feature[1]+" wird als Nächstes eingerichtet.");
-    container.appendChild(button);
-  });
+ features.forEach(feature => {
+  const button = document.createElement("button");
+  button.className = "feature";
+  button.textContent = feature[0]+" "+feature[1];
+  button.onclick = () => alert("Diesen Bereich bauen wir als Nächstes aus.");
+  container.appendChild(button);
+ });
 }
 
 function openPhotos() {
-  showPage("photoPage");
-}
-
-function goHome() {
-  showPage("home");
+ showPage("photoPage");
 }
 
 document.getElementById("photoInput").addEventListener("change",function() {
-  const files = Array.from(this.files);
-  files.forEach(file => {
-    if(file.type.startsWith("image/")) {
-      selectedPhotos.push({
-        id: Date.now()+Math.random(),
-        file:file,
-        url:URL.createObjectURL(file)
-      });
-    }
-  });
-  this.value = "";
-  renderPhotos();
+ Array.from(this.files).forEach(file => {
+  if(file.type.startsWith("image/")) {
+   photos.push({file:file,url:URL.createObjectURL(file)});
+  }
+ });
+ this.value = "";
+ renderPhotos();
 });
 
 function renderPhotos() {
-  const preview = document.getElementById("preview");
-  preview.innerHTML = "";
+ const preview = document.getElementById("preview");
+ preview.innerHTML = "";
 
-  selectedPhotos.forEach(photo => {
-    const card = document.createElement("div");
-    card.className = "photo-card";
+ photos.forEach((photo,index) => {
+  const card = document.createElement("div");
+  card.className = "photo-card";
 
-    const img = document.createElement("img");
-    img.src = photo.url;
-    img.alt = "Ausgewählte Heftseite";
+  const img = document.createElement("img");
+  img.src = photo.url;
+  img.alt = "Heftseite";
 
-    const button = document.createElement("button");
-    button.textContent = "Seite entfernen";
-    button.onclick = () => {
-      URL.revokeObjectURL(photo.url);
-      selectedPhotos = selectedPhotos.filter(p => p.id !== photo.id);
-      renderPhotos();
-    };
+  const remove = document.createElement("button");
+  remove.textContent = "Seite entfernen";
+  remove.onclick = () => {
+   URL.revokeObjectURL(photo.url);
+   photos.splice(index,1);
+   renderPhotos();
+  };
 
-    card.appendChild(img);
-    card.appendChild(button);
-    preview.appendChild(card);
+  card.append(img,remove);
+  preview.appendChild(card);
+ });
+
+ document.getElementById("photoStatus").textContent =
+  photos.length+" Seite(n) ausgewählt.";
+}
+
+async function recognizeText() {
+ if(photos.length === 0) {
+  alert("Bitte zuerst eine Heftseite auswählen.");
+  return;
+ }
+
+ if(typeof Tesseract === "undefined") {
+  alert("Die Texterkennung konnte nicht geladen werden. Bitte Internetverbindung prüfen.");
+  return;
+ }
+
+ const output = document.getElementById("recognizedText");
+ const progress = document.getElementById("progress");
+ output.value = "";
+ progress.textContent = "Texterkennung wird gestartet ...";
+
+ try {
+  const worker = await Tesseract.createWorker("deu", 1, {
+   logger: message => {
+    if(message.status === "recognizing text") {
+     progress.textContent =
+      "Texterkennung: "+Math.round(message.progress*100)+" %";
+    }
+   }
   });
 
-  document.getElementById("photoStatus").textContent =
-    selectedPhotos.length+" Seite(n) ausgewählt.";
-}
+  for(let i=0;i<photos.length;i++) {
+   progress.textContent =
+    "Seite "+(i+1)+" von "+photos.length+" wird gelesen ...";
 
-function preparePages() {
-  if(selectedPhotos.length === 0) {
-    alert("Bitte wähle zuerst mindestens eine Heftseite aus.");
-    return;
+   const result = await worker.recognize(photos[i].file);
+   output.value +=
+    "\n--- Seite "+(i+1)+" ---\n\n"+
+    result.data.text+"\n\n";
   }
 
-  const subject = subjectSelect.value;
+  await worker.terminate();
+  progress.textContent = "✅ Texterkennung abgeschlossen!";
+ } catch(error) {
+  progress.textContent = "Fehler bei der Texterkennung.";
+  alert("Die Texterkennung hat nicht funktioniert. Bitte versuche es erneut.");
+ }
+}
 
-  alert(
-    selectedPhotos.length+" Seite(n) für "+subject+
-    " ausgewählt.\n\nDie Texterkennung und Erstellung des Lernzettels richten wir als Nächstes ein."
-  );
+async function copyText() {
+ const text = document.getElementById("recognizedText").value;
+ if(!text.trim()) {
+  alert("Es gibt noch keinen Text zum Kopieren.");
+  return;
+ }
+ try {
+  await navigator.clipboard.writeText(text);
+  alert("Text wurde kopiert!");
+ } catch(error) {
+  alert("Bitte markiere den Text und kopiere ihn manuell.");
+ }
 }
 </script>
-
 </body>
 </html>
-
