@@ -1,46 +1,35 @@
-jj
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#3978c8">
 <title>LernHeld 1.0</title>
 
 <style>
 * { box-sizing:border-box; }
-
 body {
   margin:0;
   font-family:Arial,sans-serif;
   background:#f1f6fc;
   color:#26364a;
 }
-
 header {
   background:#3978c8;
   color:white;
   text-align:center;
   padding:25px 15px;
 }
-
 header h1 { margin:0; font-size:34px; }
 header p { margin:8px 0 0; }
-
-main {
-  max-width:750px;
-  margin:auto;
-  padding:20px;
-}
-
-h2 { color:#315f99; }
-h3 { color:#315f99; }
-
+main { max-width:750px; margin:auto; padding:20px; }
+h2,h3 { color:#315f99; }
 .grid {
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:12px;
 }
-
 .tile,.feature {
   background:white;
   border:0;
@@ -52,17 +41,11 @@ h3 { color:#315f99; }
   cursor:pointer;
   color:#26364a;
 }
-
 .tile span {
   display:block;
   font-size:30px;
   margin-bottom:8px;
 }
-
-.tile:active,.feature:active {
-  transform:scale(.97);
-}
-
 .camera,.primary {
   display:block;
   width:100%;
@@ -77,24 +60,20 @@ h3 { color:#315f99; }
   cursor:pointer;
   text-align:center;
 }
-
 .camera {
   background:#e2efff;
   color:#245d9e;
   border:2px dashed #3978c8;
 }
-
 .camera span {
   display:block;
   font-size:35px;
   margin-bottom:8px;
 }
-
 .secondary {
   background:#e2efff;
   color:#245d9e;
 }
-
 .back {
   padding:12px 18px;
   border:0;
@@ -105,7 +84,6 @@ h3 { color:#315f99; }
   font-size:15px;
   cursor:pointer;
 }
-
 .feature {
   width:100%;
   display:block;
@@ -114,12 +92,6 @@ h3 { color:#315f99; }
   margin-bottom:10px;
   font-size:16px;
 }
-
-.feature span {
-  font-size:25px;
-  margin-right:10px;
-}
-
 select,input,textarea {
   width:100%;
   padding:13px;
@@ -130,35 +102,29 @@ select,input,textarea {
   margin:8px 0 16px;
   font-family:Arial,sans-serif;
 }
-
 textarea {
   min-height:250px;
   resize:vertical;
   line-height:1.7;
   font-size:18px;
 }
-
 input[type=file] { display:none; }
-
 .preview {
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:10px;
   margin:15px 0;
 }
-
 .photo-card {
   background:white;
   padding:7px;
   border-radius:12px;
 }
-
 .photo-card img {
   width:100%;
   height:150px;
   object-fit:contain;
 }
-
 .photo-card button {
   width:100%;
   padding:9px;
@@ -168,13 +134,12 @@ input[type=file] { display:none; }
   color:#a33;
   margin-top:5px;
 }
-
 #progress {
   margin:15px 0;
   color:#245d9e;
   font-weight:bold;
+  overflow-wrap:anywhere;
 }
-
 .saved-item {
   background:white;
   padding:15px;
@@ -182,7 +147,6 @@ input[type=file] { display:none; }
   border-radius:12px;
   box-shadow:0 2px 8px #00000010;
 }
-
 .saved-item button {
   padding:8px;
   border:0;
@@ -191,15 +155,16 @@ input[type=file] { display:none; }
   background:#e2efff;
   color:#245d9e;
 }
-
+button:disabled {
+  opacity:.55;
+  cursor:wait;
+}
 footer {
   text-align:center;
   padding:25px;
   color:#718096;
 }
-
 [hidden] { display:none !important; }
-
 @media(max-width:420px) {
   .grid { gap:8px; }
   .tile { font-size:12px; padding:15px 3px; }
@@ -209,7 +174,6 @@ footer {
 </head>
 
 <body>
-
 <header>
   <h1>⭐ LernHeld</h1>
   <p>Einfach lernen. Besser verstehen.</p>
@@ -217,15 +181,12 @@ footer {
 
 <main>
 
-<!-- STARTSEITE -->
-
 <section id="home">
   <h2>Hallo, LernHeld! 👋</h2>
   <p>Was möchtest du heute lernen?</p>
-
   <div class="grid" id="subjects"></div>
 
-  <button class="camera" onclick="openPhotos()">
+  <button type="button" class="camera" onclick="openPhotos()">
     <span>📸 ＋</span>
     Neue Heftseite fotografieren
     <small>Foto aufnehmen oder aus der Galerie wählen</small>
@@ -235,24 +196,15 @@ footer {
   <div id="homeSavedSheets"></div>
 </section>
 
-
-<!-- FACHBEREICH -->
-
 <section id="subjectPage" hidden>
-  <button class="back" onclick="goHome()">← Zurück</button>
-
+  <button type="button" class="back" onclick="goHome()">← Zurück</button>
   <h2 id="subjectTitle"></h2>
   <p>Was möchtest du in diesem Fach machen?</p>
-
   <div id="features"></div>
 </section>
 
-
-<!-- FOTO UND TEXTERKENNUNG -->
-
 <section id="photoPage" hidden>
-  <button class="back" onclick="goHome()">← Zurück</button>
-
+  <button type="button" class="back" onclick="goHome()">← Zurück</button>
   <h2>📸 Heftseiten aufnehmen</h2>
   <p>Fotografiere deine Schulaufzeichnungen.</p>
 
@@ -265,82 +217,56 @@ footer {
     <small>Mehrere Seiten auswählen</small>
   </label>
 
-  <input type="file" id="photoInput"
-    accept="image/*" multiple>
-
+  <input type="file" id="photoInput" accept="image/*" multiple>
   <div id="preview" class="preview"></div>
-
   <p id="photoStatus"></p>
 
-  <button class="primary" onclick="recognizeText()">
+  <button type="button" class="primary" id="recognizeButton" onclick="recognizeText()">
     🔎 Text erkennen
   </button>
 
-  <div id="progress"></div>
+  <div id="progress" aria-live="polite"></div>
 
   <h3>Erkannter Text</h3>
   <p>Du kannst den Text kontrollieren und bearbeiten.</p>
+  <textarea id="recognizedText" placeholder="Hier erscheint der erkannte Text ..."></textarea>
 
-  <textarea id="recognizedText"
-    placeholder="Hier erscheint der erkannte Text ..."></textarea>
-
-  <button class="primary secondary" onclick="copyText()">
+  <button type="button" class="primary secondary" onclick="copyText()">
     Text kopieren
   </button>
-
-  <button class="primary" onclick="createManualSheet()">
+  <button type="button" class="primary" onclick="createManualSheet()">
     📝 Manuellen Lernzettel erstellen
   </button>
-
-  <button class="primary" onclick="createAutoSheet()">
+  <button type="button" class="primary" onclick="createAutoSheet()">
     ✨ Automatischen Lernzettel erstellen
   </button>
 </section>
 
-
-<!-- LERNZETTEL -->
-
 <section id="sheetPage" hidden>
-  <button class="back" onclick="goBack()">← Zurück</button>
-
+  <button type="button" class="back" onclick="goBack()">← Zurück</button>
   <h2>📝 Mein Lernzettel</h2>
   <p>Gestalte und bearbeite deinen Lernzettel.</p>
 
   <label>Überschrift</label>
-  <input id="sheetTitle" type="text"
-    placeholder="Mein Lernthema">
+  <input id="sheetTitle" type="text" placeholder="Mein Lernthema">
 
   <label>Schulfach</label>
   <select id="sheetSubject"></select>
 
   <label>Dein Lerntext</label>
-  <textarea id="sheetContent"
-    placeholder="Schreibe hier deinen Lerntext ..."></textarea>
+  <textarea id="sheetContent" placeholder="Schreibe hier deinen Lerntext ..."></textarea>
 
-  <button class="primary" onclick="saveSheet()">
-    💾 Lernzettel speichern
-  </button>
+  <button type="button" class="primary" onclick="saveSheet()">💾 Lernzettel speichern</button>
+  <button type="button" class="primary secondary" onclick="printSheet()">🖨️ Lernzettel drucken / PDF</button>
 
-  <button class="primary secondary" onclick="printSheet()">
-    🖨️ Lernzettel drucken / PDF
-  </button>
   <h3>Meine gespeicherten Lernzettel</h3>
-<div id="savedSheets"></div>
+  <div id="savedSheets"></div>
 </section>
 
-
-<!-- AUTOMATISCHER LERNZETTEL -->
-
 <section id="autoPage" hidden>
-  <button class="back" onclick="goBack()">← Zurück</button>
-
+  <button type="button" class="back" onclick="goBack()">← Zurück</button>
   <h2>✨ Automatischer Lernzettel</h2>
-
-  <p>
-    Hier wird LernHeld später deinen Text automatisch
-    zusammenfassen und in einfache Sprache umwandeln.
-  </p>
-
+  <p>Die KI-Zusammenfassung wird in einem späteren Entwicklungsschritt eingerichtet.</p>
   <div style="background:white;padding:18px;border-radius:14px;">
     <h3>Das soll die KI erledigen:</h3>
     <p>✓ Schwierige Wörter erklären</p>
@@ -349,107 +275,62 @@ footer {
     <p>✓ Übersichtliche Stichpunkte erstellen</p>
     <p>✓ Kontrollfragen erstellen</p>
   </div>
-
-  <p>
-    Die sichere KI-Verbindung wird im nächsten
-    Entwicklungsschritt eingerichtet.
-  </p>
-
-  <button class="primary" onclick="createManualSheet()">
-    Erkannte Texte manuell bearbeiten
-  </button>
+  <button type="button" class="primary" onclick="createManualSheet()">Erkannte Texte manuell bearbeiten</button>
 </section>
 
 </main>
 
-<footer>
-  LernHeld 1.0 · Gemeinsam stark lernen
-</footer>
+<footer>LernHeld 1.0 · Gemeinsam stark lernen</footer>
 
-
-<!-- TEXTERKENNUNG -->
-
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-<script>
-
-// SCHULFÄCHER
-
+<script type="module">
 const subjects = [
-  ["📖","Deutsch"],
-  ["🇬🇧","Englisch"],
-  ["🔢","Mathematik"],
-  ["🧬","Biologie"],
-  ["🏛️","Geschichte"],
-  ["⚡","Physik"],
-  ["🧪","Chemie"],
-  ["🌍","Erdkunde"],
-  ["💼","Wirtschaft"],
-  ["⚖️","Ethik"],
-  ["🎵","Musik"],
-  ["🏫","Sozialkunde"]
+  ["📖","Deutsch"],["🇬🇧","Englisch"],["🔢","Mathematik"],
+  ["🧬","Biologie"],["🏛️","Geschichte"],["⚡","Physik"],
+  ["🧪","Chemie"],["🌍","Erdkunde"],["💼","Wirtschaft"],
+  ["⚖️","Ethik"],["🎵","Musik"],["🏫","Sozialkunde"]
 ];
 
 const features = [
-  ["📝","Lernzettel"],
-  ["🎴","Lernkarten"],
-  ["🧠","Mindmaps"],
-  ["🎯","Quiz"],
-  ["🔊","Vorlesen"]
+  ["📝","Lernzettel"],["🎴","Lernkarten"],["🧠","Mindmaps"],
+  ["🎯","Quiz"],["🔊","Vorlesen"]
 ];
 
 let photos = [];
 let currentSubject = "";
 let previousPage = "home";
-let worker = null;
+let ocrEngine = null;
+let ocrLoading = false;
+let recognizing = false;
 
+const $ = id => document.getElementById(id);
 
-// ELEMENTE ERSTELLEN
+const subjectContainer = $("subjects");
+const subjectSelect = $("subjectSelect");
+const sheetSubject = $("sheetSubject");
 
-const subjectContainer = document.getElementById("subjects");
-const subjectSelect = document.getElementById("subjectSelect");
-const sheetSubject = document.getElementById("sheetSubject");
-
-subjects.forEach(subject => {
-
+subjects.forEach(([icon,name]) => {
   const button = document.createElement("button");
+  button.type = "button";
   button.className = "tile";
-  button.innerHTML =
-    `<span>${subject[0]}</span>${subject[1]}`;
-
-  button.onclick = () =>
-    openSubject(subject[0],subject[1]);
-
+  const span = document.createElement("span");
+  span.textContent = icon;
+  button.append(span,document.createTextNode(name));
+  button.onclick = () => openSubject(icon,name);
   subjectContainer.appendChild(button);
 
-  const option = document.createElement("option");
-  option.value = subject[1];
-  option.textContent = subject[1];
-
-  subjectSelect.appendChild(option);
-
-  const option2 = option.cloneNode(true);
-  sheetSubject.appendChild(option2);
-
+  [subjectSelect,sheetSubject].forEach(select => {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    select.appendChild(option);
+  });
 });
 
-
-// NAVIGATION
-
 function showPage(id) {
-
-  [
-    "home",
-    "subjectPage",
-    "photoPage",
-    "sheetPage",
-    "autoPage"
-  ].forEach(page => {
-    document.getElementById(page).hidden = page !== id;
+  ["home","subjectPage","photoPage","sheetPage","autoPage"].forEach(page => {
+    $(page).hidden = page !== id;
   });
-
   window.scrollTo(0,0);
-
 }
 
 function goHome() {
@@ -468,298 +349,254 @@ function openPhotos() {
 }
 
 function openSubject(icon,name) {
-
   currentSubject = name;
   showPage("subjectPage");
+  $("subjectTitle").textContent = icon+" "+name;
 
-  document.getElementById("subjectTitle").textContent =
-    icon+" "+name;
-
-  const container = document.getElementById("features");
+  const container = $("features");
   container.innerHTML = "";
 
-  features.forEach(feature => {
-
+  features.forEach(([symbol,label]) => {
     const button = document.createElement("button");
+    button.type = "button";
     button.className = "feature";
-    button.textContent = feature[0]+" "+feature[1];
+    button.textContent = symbol+" "+label;
 
     button.onclick = () => {
-
-      if(feature[1] === "Lernzettel") {
+      if(label === "Lernzettel") {
         previousPage = "subjectPage";
-        document.getElementById("sheetTitle").value = "";
-        document.getElementById("sheetSubject").value = name;
-        document.getElementById("sheetContent").value = "";
+        $("sheetTitle").value = "";
+        $("sheetSubject").value = name;
+        $("sheetContent").value = "";
+        delete $("sheetPage").dataset.editId;
         showPage("sheetPage");
       } else {
-        alert(feature[1]+" wird in einem späteren Schritt eingerichtet.");
+        alert(label+" wird in einem späteren Schritt eingerichtet.");
       }
-
     };
-
     container.appendChild(button);
-
   });
-
 }
 
-
-// BILDER AUSWÄHLEN
-
-document.getElementById("photoInput")
-.addEventListener("change",function() {
-
+$("photoInput").addEventListener("change",function() {
   Array.from(this.files).forEach(file => {
-
     if(file.type.startsWith("image/")) {
-
-      photos.push({
-        file:file,
-        url:URL.createObjectURL(file)
-      });
-
+      photos.push({file,url:URL.createObjectURL(file)});
     }
-
   });
-
   this.value = "";
   renderPhotos();
-
 });
 
 function renderPhotos() {
-
-  const preview = document.getElementById("preview");
+  const preview = $("preview");
   preview.innerHTML = "";
 
   photos.forEach((photo,index) => {
-
     const card = document.createElement("div");
     card.className = "photo-card";
 
     const img = document.createElement("img");
     img.src = photo.url;
-    img.alt = "Heftseite";
+    img.alt = "Schulbuchseite";
 
     const remove = document.createElement("button");
+    remove.type = "button";
     remove.textContent = "Seite entfernen";
-
     remove.onclick = () => {
-
       URL.revokeObjectURL(photo.url);
       photos.splice(index,1);
       renderPhotos();
-
     };
 
     card.append(img,remove);
     preview.appendChild(card);
-
   });
 
-  document.getElementById("photoStatus").textContent =
-    photos.length+" Seite(n) ausgewählt.";
-
+  $("photoStatus").textContent = photos.length+" Seite(n) ausgewählt.";
 }
 
+// Fotos verkleinern, damit das iPad weniger Speicher benötigt.
+async function preparePhoto(file) {
+  const image = new Image();
+  const url = URL.createObjectURL(file);
 
-// BILD VERBESSERN
+  try {
+    image.src = url;
+    await image.decode();
 
+    const maxSide = 1800;
+    const scale = Math.min(1,maxSide/Math.max(image.naturalWidth,image.naturalHeight));
 
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1,Math.round(image.naturalWidth*scale));
+    canvas.height = Math.max(1,Math.round(image.naturalHeight*scale));
 
-// PADDLEOCR – NEUE DEUTSCHE TEXTERKENNUNG
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "white";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.filter = "grayscale(1) contrast(1.2)";
+    ctx.drawImage(image,0,0,canvas.width,canvas.height);
+    ctx.filter = "none";
 
+    const blob = await new Promise(resolve =>
+      canvas.toBlob(resolve,"image/jpeg",0.88)
+    );
 
+    if(!blob) throw new Error("Das Foto konnte nicht vorbereitet werden.");
+    return blob;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+// PaddleOCR nur einmal laden und anschließend wiederverwenden.
+async function getOcrEngine() {
+  if(ocrEngine) return ocrEngine;
+  if(ocrLoading) throw new Error("Das OCR-Modell wird bereits geladen.");
+
+  ocrLoading = true;
+  try {
+    $("progress").textContent = "PaddleOCR wird geladen. Beim ersten Mal kann es länger dauern ...";
+
+    const {PaddleOCR} = await import(
+      "https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm"
+    );
+
+    $("progress").textContent = "Deutsches OCR-Modell wird geladen ...";
+
+    ocrEngine = await PaddleOCR.create({
+      lang: "de",
+      ocrVersion: "PP-OCRv6",
+      ortOptions: {
+        backend: "wasm",
+        wasmPaths: "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/",
+        numThreads: 1,
+        simd: true
+      }
+    });
+
+    return ocrEngine;
+  } finally {
+    ocrLoading = false;
+  }
+}
 
 async function recognizeText() {
-  if (photos.length === 0) {
+  if(recognizing) return;
+
+  if(photos.length === 0) {
     alert("Bitte zuerst eine Schulbuchseite auswählen.");
     return;
   }
 
-  const output = document.getElementById("recognizedText");
-  const progress = document.getElementById("progress");
-
-  let ocr = null;
-  output.value = "";
+  recognizing = true;
+  const button = $("recognizeButton");
+  button.disabled = true;
+  $("recognizedText").value = "";
 
   try {
-    progress.textContent = "PaddleOCR wird geladen ...";
-
-    const { PaddleOCR } = await import(
-      "https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm"
-    );
-
-    progress.textContent = "Deutsches Modell wird vorbereitet ...";
-
-    ocr = await PaddleOCR.create({
-      textDetectionModelName: "PP-OCRv6_tiny_det",
-      textRecognitionModelName: "PP-OCRv6_tiny_rec",
-      ortOptions: {
-        backend: "auto"
-      }
-    });
-
+    const ocr = await getOcrEngine();
     const pages = [];
 
-    for (let i = 0; i < photos.length; i++) {
-      progress.textContent =
-        "Schulbuchseite " + (i + 1) +
-        " von " + photos.length + " wird erkannt ...";
+    for(let i=0;i<photos.length;i++) {
+      $("progress").textContent =
+        "Schulbuchseite "+(i+1)+" von "+photos.length+" wird vorbereitet ...";
 
-      const results = await ocr.predict(photos[i].file);
-      const result = results[0];
+      const blob = await preparePhoto(photos[i].file);
 
-      const lines = result.items.map(item => item.text);
+      $("progress").textContent =
+        "Schulbuchseite "+(i+1)+" von "+photos.length+" wird erkannt ...";
+
+      const results = await ocr.predict(blob);
+      const result = results && results[0];
+
+      if(!result || !Array.isArray(result.items)) {
+        throw new Error("Die OCR hat kein lesbares Ergebnis geliefert.");
+      }
+
+      const lines = result.items
+        .map(item => item.text)
+        .filter(text => text && text.trim());
 
       pages.push(
-        "--- Seite " + (i + 1) + " ---\n\n" +
-        lines.join("\n")
+        "--- Seite "+(i+1)+" ---\n\n"+lines.join("\n")
       );
     }
 
-    output.value = pages.join("\n\n");
-
-    progress.textContent =
+    $("recognizedText").value = pages.join("\n\n");
+    $("progress").textContent =
       "✅ Texterkennung abgeschlossen. Bitte Text überprüfen.";
 
-  } catch (error) {
-    console.error("PaddleOCR:", error);
-
-    progress.textContent = "❌ Fehler bei der Texterkennung.";
-
-    alert("PaddleOCR-Fehler: " + error.message);
-
-  } finally {
-    if (ocr) {
-      await ocr.dispose();
+    if(!$("recognizedText").value.trim()) {
+      $("progress").textContent =
+        "Es wurde kein Text gefunden. Bitte Foto heller und gerade aufnehmen.";
     }
+
+  } catch(error) {
+    console.error("PaddleOCR Fehler:",error);
+    $("progress").textContent = "❌ Texterkennung fehlgeschlagen.";
+    alert("Fehler bei der Texterkennung:\n"+(error.message || error));
+  } finally {
+    recognizing = false;
+    button.disabled = false;
   }
 }
 
-
-
-
-
-
-
-
-
-
-// TEXT KOPIEREN
-
 async function copyText() {
-
-  const text =
-    document.getElementById("recognizedText").value;
-
+  const text = $("recognizedText").value;
   if(!text.trim()) {
     alert("Es gibt noch keinen Text.");
     return;
   }
-
   try {
-
     await navigator.clipboard.writeText(text);
     alert("Text wurde kopiert!");
-
   } catch(error) {
-
     alert("Bitte markiere den Text und kopiere ihn manuell.");
-
   }
-
 }
-
-
-// MANUELLEN LERNZETTEL ERSTELLEN
 
 function createManualSheet() {
+  const text = $("recognizedText").value;
 
-  const text =
-    document.getElementById("recognizedText").value;
-
-  previousPage =
-    document.getElementById("sheetPage").hidden
-      ? "photoPage"
-      : previousPage;
-
-  if(!text.trim()) {
-
-    if(!document.getElementById("sheetContent").value.trim()) {
-      alert("Bitte zuerst einen Text eingeben.");
-      return;
-    }
-
-  }
-
-  if(text.trim()) {
-
-    document.getElementById("sheetContent").value = text;
-
-  }
-
-  if(document.getElementById("subjectPage").hidden === false) {
-    document.getElementById("sheetSubject").value =
-      currentSubject;
-  } else {
-    document.getElementById("sheetSubject").value =
-      document.getElementById("subjectSelect").value;
-  }
-
-  if(!document.getElementById("sheetTitle").value) {
-    document.getElementById("sheetTitle").value =
-      "Mein Lernzettel";
-  }
-
-  showPage("sheetPage");
-
-}
-
-
-// AUTOMATISCHER LERNZETTEL
-
-function createAutoSheet() {
-
-  const text =
-    document.getElementById("recognizedText").value;
-
-  if(!text.trim()) {
-    alert("Bitte zuerst einen Text erkennen lassen.");
+  if(!text.trim() && !$("sheetContent").value.trim()) {
+    alert("Bitte zuerst einen Text erkennen lassen oder einen Lerntext eingeben.");
     return;
   }
 
   previousPage = "photoPage";
-  showPage("autoPage");
+  if(text.trim()) $("sheetContent").value = text;
 
+  $("sheetSubject").value = $("subjectPage").hidden
+    ? $("subjectSelect").value
+    : currentSubject;
+
+  if(!$("sheetTitle").value) $("sheetTitle").value = "Mein Lernzettel";
+  showPage("sheetPage");
 }
 
-
-// LERNZETTEL SPEICHERN
+function createAutoSheet() {
+  if(!$("recognizedText").value.trim()) {
+    alert("Bitte zuerst einen Text erkennen lassen.");
+    return;
+  }
+  previousPage = "photoPage";
+  showPage("autoPage");
+}
 
 function getSheets() {
-
   try {
-    return JSON.parse(
-      localStorage.getItem("lernheldSheets") || "[]"
-    );
+    return JSON.parse(localStorage.getItem("lernheldSheets") || "[]");
   } catch(error) {
     return [];
   }
-
 }
 
 function saveSheet() {
-
-  const title =
-    document.getElementById("sheetTitle").value.trim();
-
-  const content =
-    document.getElementById("sheetContent").value.trim();
-
-  const subject =
-    document.getElementById("sheetSubject").value;
+  const title = $("sheetTitle").value.trim();
+  const content = $("sheetContent").value.trim();
+  const subject = $("sheetSubject").value;
 
   if(!title || !content) {
     alert("Bitte Überschrift und Lerntext eingeben.");
@@ -767,194 +604,102 @@ function saveSheet() {
   }
 
   const sheets = getSheets();
-
-  const existingId =
-    document.getElementById("sheetPage").dataset.editId;
+  const existingId = $("sheetPage").dataset.editId;
 
   if(existingId) {
-
-    const index = sheets.findIndex(
-      sheet => String(sheet.id) === existingId
-    );
-
+    const index = sheets.findIndex(sheet => String(sheet.id) === existingId);
     if(index !== -1) {
-
-      sheets[index] = {
-        id:sheets[index].id,
-        title:title,
-        subject:subject,
-        content:content
-      };
-
+      sheets[index] = {id:sheets[index].id,title,subject,content};
     }
-
-    delete document.getElementById("sheetPage").dataset.editId;
-
+    delete $("sheetPage").dataset.editId;
   } else {
-
-    sheets.push({
-      id:Date.now(),
-      title:title,
-      subject:subject,
-      content:content
-    });
-
+    sheets.push({id:Date.now(),title,subject,content});
   }
 
   try {
-
-    localStorage.setItem(
-      "lernheldSheets",
-      JSON.stringify(sheets)
-    );
-
+    localStorage.setItem("lernheldSheets",JSON.stringify(sheets));
     alert("Dein Lernzettel wurde gespeichert!");
-
     renderSavedSheets();
     renderHomeSheets();
-
   } catch(error) {
-
     alert("Speichern nicht möglich. Der Gerätespeicher ist möglicherweise voll.");
-
   }
-
 }
 
-
-// GESPEICHERTE LERNZETTEL ANZEIGEN
+function openSavedSheet(sheet) {
+  $("sheetTitle").value = sheet.title;
+  $("sheetSubject").value = sheet.subject;
+  $("sheetContent").value = sheet.content;
+  $("sheetPage").dataset.editId = String(sheet.id);
+  previousPage = "home";
+  showPage("sheetPage");
+}
 
 function renderSavedSheets() {
-
   const sheets = getSheets();
-  const container = document.getElementById("savedSheets");
-
+  const container = $("savedSheets");
   container.innerHTML = "";
 
-  if(sheets.length === 0) {
+  if(!sheets.length) {
     container.textContent = "Noch keine Lernzettel gespeichert.";
     return;
   }
 
   sheets.forEach(sheet => {
-
     const card = document.createElement("div");
     card.className = "saved-item";
 
     const heading = document.createElement("strong");
-    heading.textContent =
-      "📄 "+sheet.title+" – "+sheet.subject;
+    heading.textContent = "📄 "+sheet.title+" – "+sheet.subject;
 
     const edit = document.createElement("button");
+    edit.type = "button";
     edit.textContent = "Öffnen";
-
-    edit.onclick = () => {
-
-      document.getElementById("sheetTitle").value =
-        sheet.title;
-
-      document.getElementById("sheetSubject").value =
-        sheet.subject;
-
-      document.getElementById("sheetContent").value =
-        sheet.content;
-
-      document.getElementById("sheetPage").dataset.editId =
-        String(sheet.id);
-
-      previousPage = "home";
-      showPage("sheetPage");
-
-    };
+    edit.onclick = () => openSavedSheet(sheet);
 
     const remove = document.createElement("button");
+    remove.type = "button";
     remove.textContent = "Löschen";
-
     remove.onclick = () => {
-
       if(confirm("Diesen Lernzettel wirklich löschen?")) {
-
-        const updated = getSheets().filter(
-          item => item.id !== sheet.id
-        );
-
         localStorage.setItem(
           "lernheldSheets",
-          JSON.stringify(updated)
+          JSON.stringify(getSheets().filter(item => item.id !== sheet.id))
         );
-
         renderSavedSheets();
         renderHomeSheets();
-
       }
-
     };
 
     card.append(heading,document.createElement("br"),edit,remove);
     container.appendChild(card);
-
   });
-
 }
 
 function renderHomeSheets() {
-
   const sheets = getSheets();
-  const container = document.getElementById("homeSavedSheets");
-
+  const container = $("homeSavedSheets");
   container.innerHTML = "";
 
-  if(sheets.length === 0) {
+  if(!sheets.length) {
     container.textContent = "Noch keine Lernzettel vorhanden.";
     return;
   }
 
   sheets.forEach(sheet => {
-
     const button = document.createElement("button");
+    button.type = "button";
     button.className = "feature";
-
-    button.textContent =
-      "📄 "+sheet.title+" ("+sheet.subject+")";
-
-    button.onclick = () => {
-
-      document.getElementById("sheetTitle").value =
-        sheet.title;
-
-      document.getElementById("sheetSubject").value =
-        sheet.subject;
-
-      document.getElementById("sheetContent").value =
-        sheet.content;
-
-      document.getElementById("sheetPage").dataset.editId =
-        String(sheet.id);
-
-      previousPage = "home";
-      showPage("sheetPage");
-
-    };
-
+    button.textContent = "📄 "+sheet.title+" ("+sheet.subject+")";
+    button.onclick = () => openSavedSheet(sheet);
     container.appendChild(button);
-
   });
-
 }
 
-
-// DRUCKEN UND PDF
-
 function printSheet() {
-
-  const title =
-    document.getElementById("sheetTitle").value;
-
-  const subject =
-    document.getElementById("sheetSubject").value;
-
-  const content =
-    document.getElementById("sheetContent").value;
+  const title = $("sheetTitle").value;
+  const subject = $("sheetSubject").value;
+  const content = $("sheetContent").value;
 
   if(!content.trim()) {
     alert("Bitte zuerst einen Lerntext eingeben.");
@@ -962,18 +707,13 @@ function printSheet() {
   }
 
   const printWindow = window.open("","_blank");
-
   if(!printWindow) {
     alert("Bitte erlaube das Öffnen des Druckfensters.");
     return;
   }
 
   const safe = value => value.replace(/[&<>"']/g,char => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[char]);
 
   printWindow.document.write(`
@@ -983,14 +723,9 @@ function printSheet() {
     <meta charset="UTF-8">
     <title>${safe(title)}</title>
     <style>
-      body {
-        font-family:Arial,sans-serif;
-        padding:30px;
-        line-height:1.8;
-        font-size:17px;
-      }
-      h1 { color:#315f99; }
-      .content { white-space:pre-wrap; }
+      body {font-family:Arial,sans-serif;padding:30px;line-height:1.8;font-size:17px;}
+      h1 {color:#315f99;}
+      .content {white-space:pre-wrap;}
     </style>
     </head>
     <body>
@@ -1001,22 +736,12 @@ function printSheet() {
     </body>
     </html>
   `);
-
   printWindow.document.close();
   printWindow.focus();
-
-  setTimeout(() => {
-    printWindow.print();
-  },500);
-
+  setTimeout(() => printWindow.print(),500);
 }
 
-
-// START
-
 renderHomeSheets();
-
 </script>
-
 </body>
 </html>
