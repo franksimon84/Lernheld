@@ -469,7 +469,10 @@ async function getOcrEngine() {
       lang: "de",
       ocrVersion: "PP-OCRv6",
       ortOptions: {
-        backend: "auto"
+        backend: "wasm",
+        wasmPaths: "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/",
+        numThreads: 1,
+        simd: true
       }
     });
 
@@ -739,6 +742,6 @@ function printSheet() {
 }
 
 renderHomeSheets();
-<script type="module">
+</script>
 </body>
 </html>
