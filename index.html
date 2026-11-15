@@ -570,83 +570,48 @@ function renderPhotos() {
 
 // PADDLEOCR – NEUE DEUTSCHE TEXTERKENNUNG
 
+
 async function recognizeText() {
-
-  if (photos.length === 0) {
-    alert("Bitte zuerst eine Schulbuchseite auswählen.");
-    return;
-  }
-
-  const output = document.getElementById("recognizedText");
   const progress = document.getElementById("progress");
-
-  output.value = "";
 
   let ocr = null;
 
   try {
-    progress.textContent =
-      "PaddleOCR wird geladen. Beim ersten Start kann das etwas dauern ...";
+    progress.textContent = "PaddleOCR wird geladen ...";
 
     const { PaddleOCR } = await import(
       "https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm"
     );
 
     progress.textContent =
-      "Deutsches Erkennungsmodell wird vorbereitet ...";
+      "Kleines deutsches OCR-Modell wird geladen ...";
 
     ocr = await PaddleOCR.create({
-      lang: "german",
-      ocrVersion: "PP-OCRv6",
+      textDetectionModelName: "PP-OCRv6_tiny_det",
+      textRecognitionModelName: "PP-OCRv6_tiny_rec",
       ortOptions: {
-        backend: "wasm"
+        backend: "auto"
       }
     });
 
-    const results = [];
-
-    for (let i = 0; i < photos.length; i++) {
-
-      progress.textContent =
-        "Schulbuchseite " + (i + 1) +
-        " von " + photos.length + " wird erkannt ...";
-
-      const result = await ocr.predict(photos[i].file);
-
-      const text = result[0].items
-        .map(item => item.text)
-        .join("\n");
-
-      results.push(
-        "--- Seite " + (i + 1) + " ---\n\n" + text
-      );
-    }
-
-    output.value = results.join("\n\n");
-
     progress.textContent =
-      "✅ PaddleOCR abgeschlossen. Bitte Text überprüfen.";
+      "✅ PaddleOCR Tiny wurde erfolgreich gestartet!";
 
   } catch (error) {
-
-    console.error("PaddleOCR Fehler:", error);
+    console.error(error);
 
     progress.textContent =
-      "Fehler beim Laden oder Erkennen.";
+      "❌ Fehler: " + error.message;
 
-    alert(
-      "PaddleOCR konnte nicht gestartet werden. " +
-      "Bitte Internetverbindung prüfen und erneut versuchen."
-    );
+    alert("PaddleOCR-Fehler: " + error.message);
 
   } finally {
-
     if (ocr) {
       await ocr.dispose();
     }
-
   }
 }
+
 
 
 // TEXTERKENNUNG VERBESSERT
