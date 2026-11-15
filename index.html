@@ -571,10 +571,18 @@ function renderPhotos() {
 // PADDLEOCR – NEUE DEUTSCHE TEXTERKENNUNG
 
 
+
 async function recognizeText() {
+  if (photos.length === 0) {
+    alert("Bitte zuerst eine Schulbuchseite auswählen.");
+    return;
+  }
+
+  const output = document.getElementById("recognizedText");
   const progress = document.getElementById("progress");
 
   let ocr = null;
+  output.value = "";
 
   try {
     progress.textContent = "PaddleOCR wird geladen ...";
@@ -583,8 +591,7 @@ async function recognizeText() {
       "https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm"
     );
 
-    progress.textContent =
-      "Kleines deutsches OCR-Modell wird geladen ...";
+    progress.textContent = "Deutsches Modell wird vorbereitet ...";
 
     ocr = await PaddleOCR.create({
       textDetectionModelName: "PP-OCRv6_tiny_det",
@@ -594,14 +601,33 @@ async function recognizeText() {
       }
     });
 
+    const pages = [];
+
+    for (let i = 0; i < photos.length; i++) {
+      progress.textContent =
+        "Schulbuchseite " + (i + 1) +
+        " von " + photos.length + " wird erkannt ...";
+
+      const results = await ocr.predict(photos[i].file);
+      const result = results[0];
+
+      const lines = result.items.map(item => item.text);
+
+      pages.push(
+        "--- Seite " + (i + 1) + " ---\n\n" +
+        lines.join("\n")
+      );
+    }
+
+    output.value = pages.join("\n\n");
+
     progress.textContent =
-      "✅ PaddleOCR Tiny wurde erfolgreich gestartet!";
+      "✅ Texterkennung abgeschlossen. Bitte Text überprüfen.";
 
   } catch (error) {
-    console.error(error);
+    console.error("PaddleOCR:", error);
 
-    progress.textContent =
-      "❌ Fehler: " + error.message;
+    progress.textContent = "❌ Fehler bei der Texterkennung.";
 
     alert("PaddleOCR-Fehler: " + error.message);
 
@@ -611,6 +637,8 @@ async function recognizeText() {
     }
   }
 }
+
+
 
 
 
