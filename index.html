@@ -566,55 +566,48 @@ function renderPhotos() {
 
 // BILD VERBESSERN
 
-async function prepareImageForOCR(file) {
 
+async function prepareImageForOCR(file, mode = 0) {
   const image = new Image();
   const url = URL.createObjectURL(file);
 
   try {
-
     image.src = url;
     await image.decode();
 
-    const maxWidth = 2600;
-    const scale = Math.min(1.5,maxWidth/image.naturalWidth);
+    const maxWidth = 3200;
+    const scale = Math.min(2, maxWidth / image.naturalWidth);
 
     const canvas = document.createElement("canvas");
+    canvas.width = Math.round(image.naturalWidth * scale);
+    canvas.height = Math.round(image.naturalHeight * scale);
 
-    canvas.width = Math.round(image.naturalWidth*scale);
-    canvas.height = Math.round(image.naturalHeight*scale);
-
-    const ctx = canvas.getContext("2d",{
-      willReadFrequently:true
+    const ctx = canvas.getContext("2d", {
+      willReadFrequently: true
     });
 
-    ctx.filter = "grayscale(1) contrast(1.35)";
+    ctx.filter = mode === 0
+      ? "grayscale(1) contrast(1.5) brightness(1.08)"
+      : "grayscale(1) contrast(1.8) brightness(1.15)";
 
-    ctx.drawImage(
-      image,0,0,canvas.width,canvas.height
-    );
-
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     ctx.filter = "none";
 
     return canvas;
-
   } finally {
     URL.revokeObjectURL(url);
   }
-
 }
 
-
-// TEXTERKENNUNG
+// TEXTERKENNUNG VERBESSERT
 
 async function recognizeText() {
-
-  if(photos.length === 0) {
-    alert("Bitte zuerst eine Heftseite auswählen.");
+  if (photos.length === 0) {
+    alert("Bitte zuerst eine Schulbuchseite auswählen.");
     return;
   }
 
-  if(typeof Tesseract === "undefined") {
+  if (typeof Tesseract === "undefined") {
     alert("Texterkennung konnte nicht geladen werden.");
     return;
   }
@@ -625,75 +618,72 @@ async function recognizeText() {
   output.value = "";
 
   try {
+    progress.textContent = "Texterkennung wird vorbereitet ...";
 
-    progress.textContent =
-      "Texterkennung wird vorbereitet ...";
-
-    worker = await Tesseract.createWorker("deu",1,{
+    worker = await Tesseract.createWorker("deu", 1, {
       logger: message => {
-
-        if(message.status === "recognizing text") {
-
+        if (message.status === "recognizing text") {
           progress.textContent =
-            "Erkennung läuft: "+
-            Math.round(message.progress*100)+" %";
-
+            "Texterkennung: " +
+            Math.round(message.progress * 100) + " %";
         }
-
       }
-    });
-
-    await worker.setParameters({
-      tessedit_pageseg_mode:"3",
-      preserve_interword_spaces:"1",
-      user_defined_dpi:"300"
     });
 
     const results = [];
 
-    for(let i=0;i<photos.length;i++) {
-
+    for (let i = 0; i < photos.length; i++) {
       progress.textContent =
-        "Seite "+(i+1)+" von "+photos.length+
-        " wird verbessert ...";
+        "Schulbuchseite " + (i + 1) + " wird untersucht ...";
 
-      const improvedImage =
-        await prepareImageForOCR(photos[i].file);
+      const imageA = await prepareImageForOCR(photos[i].file, 0);
+      const imageB = await prepareImageForOCR(photos[i].file, 1);
 
-      const result =
-        await worker.recognize(improvedImage);
+      await worker.setParameters({
+        tessedit_pageseg_mode: "3",
+        preserve_interword_spaces: "1",
+        user_defined_dpi: "300"
+      });
+
+      const resultA = await worker.recognize(imageA);
+
+      await worker.setParameters({
+        tessedit_pageseg_mode: "6",
+        preserve_interword_spaces: "1",
+        user_defined_dpi: "300"
+      });
+
+      const resultB = await worker.recognize(imageB);
+
+      const confidenceA = resultA.data.confidence || 0;
+      const confidenceB = resultB.data.confidence || 0;
+
+      const bestResult =
+        confidenceB > confidenceA ? resultB : resultA;
 
       results.push(
-        "--- Seite "+(i+1)+" ---\n\n"+
-        result.data.text.trim()
+        "--- Seite " + (i + 1) + " ---\n\n" +
+        bestResult.data.text.trim()
       );
-
     }
 
     output.value = results.join("\n\n");
 
     progress.textContent =
-      "✅ Texterkennung abgeschlossen!";
+      "Texterkennung abgeschlossen. Bitte Text überprüfen.";
 
-  } catch(error) {
-
+  } catch (error) {
     console.error(error);
-
-    progress.textContent =
-      "Fehler bei der Texterkennung.";
-
-    alert("Bitte versuche es erneut.");
-
+    progress.textContent = "Fehler bei der Texterkennung.";
+    alert("Die Texterkennung ist fehlgeschlagen. Bitte erneut versuchen.");
   } finally {
-
-    if(worker) {
+    if (worker) {
       await worker.terminate();
       worker = null;
     }
-
   }
-
 }
+
 
 
 // TEXT KOPIEREN
