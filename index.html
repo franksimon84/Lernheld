@@ -7,13 +7,15 @@
 <meta name="theme-color" content="#3978c8">
 <title>LernHeld 1.0</title>
 <style>
-:root{--blue:#3978c8;--blue-dark:#245d9e;--pale:#e2efff;--bg:#f1f6fc;--ink:#26364a;--muted:#66788d;--white:#fff;--line:#d7e2ef}
+:root{--blue:#3978c8;--blue-dark:#245d9e;--pale:#e2efff;--bg:#f1f6fc;--ink:#26364a;--muted:#66788d;--white:#fff;--line:#d7e2ef;--green:#16845b;--red:#b33b3b}
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
 header{background:var(--blue);color:white;text-align:center;padding:22px 15px}
 header h1{margin:0;font-size:32px}
+header p{margin:6px 0 0}
 main{max-width:850px;margin:auto;padding:18px 16px 40px}
 h2,h3{color:#315f99}
+h2{margin-top:8px}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
 .tile,.feature{background:white;border:0;border-radius:15px;padding:17px 6px;text-align:center;box-shadow:0 3px 12px #00000012;font-weight:bold;cursor:pointer;color:var(--ink);font-size:15px}
 .tile span{display:block;font-size:29px;margin-bottom:6px}
@@ -29,19 +31,25 @@ input[type=file]{display:none}
 .preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
 .photo-card{background:white;padding:7px;border-radius:12px;min-width:0}
 .photo-card img{width:100%;height:150px;object-fit:contain}
-.photo-card button,.saved-item button{padding:8px 11px;border:0;border-radius:8px;margin:5px;background:var(--pale);color:var(--blue-dark);cursor:pointer}
+.photo-card button,.saved-item button,.small-button{padding:8px 11px;border:0;border-radius:8px;margin:5px 5px 0 0;background:var(--pale);color:var(--blue-dark);cursor:pointer}
 .photo-card button{width:100%;background:#fce7e7;color:#933}
 .status{margin:12px 0;color:var(--blue-dark);font-weight:bold;overflow-wrap:anywhere;white-space:pre-wrap}
 .saved-item,.panel{background:white;padding:15px;margin:10px 0;border-radius:12px;box-shadow:0 2px 8px #00000010}
+.saved-item button{margin-top:10px}
 .hint{font-size:13px;color:var(--muted)}
+.tag{display:inline-block;background:#eaf3ff;color:#245d9e;border-radius:20px;padding:4px 9px;font-size:12px;font-weight:bold}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .actions .primary{margin-top:8px}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.feature-grid button{margin:0}
 .divider{border:0;border-top:1px solid var(--line);margin:18px 0}
+.busy{opacity:.65;pointer-events:none}
 footer{text-align:center;padding:22px;color:#718096;font-size:13px}
 [hidden]{display:none!important}
 button:disabled{opacity:.55;cursor:wait}
-@media(max-width:440px){.grid{gap:7px}.tile{font-size:12px;padding:13px 3px}.tile span{font-size:26px}.actions{grid-template-columns:1fr}}
-@media print{header,footer,button,.back{display:none!important}body{background:white}main{max-width:none;padding:0}}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #91bfff;outline-offset:2px}
+@media(max-width:440px){.grid{gap:7px}.tile{font-size:12px;padding:13px 3px}.tile span{font-size:26px}.preview{grid-template-columns:1fr 1fr}.actions,.feature-grid{grid-template-columns:1fr}}
+@media print{header,footer,button,.back{display:none!important}body{background:white}main{max-width:none;padding:0}.print-content{white-space:pre-wrap}}
 </style>
 </head>
 <body>
@@ -78,7 +86,6 @@ Neue Heftseite fotografieren
 <section id="photoPage" hidden>
 <button class="back" id="photoBack">← Zurück</button>
 <h2>📸 Heftseiten aufnehmen</h2>
-
 <p>Fotografiere deine Schulaufzeichnungen oder wähle Bilder aus der Galerie.</p>
 
 <label for="subjectSelect">Schulfach auswählen</label>
@@ -96,7 +103,6 @@ Fotos hinzufügen
 <p id="photoStatus" class="hint"></p>
 
 <button class="primary" id="aiRecognize">✨ KI-Texterkennung mit Gemini</button>
-<button class="primary secondary" id="ocrRecognize">🔎 Klassische Texterkennung (PaddleOCR)</button>
 
 <p class="hint">Die KI kann gedruckte und handschriftliche Inhalte aus Fotos lesen. Bitte Ergebnis anschließend kontrollieren.</p>
 
@@ -143,7 +149,7 @@ Fotos hinzufügen
 
 <div class="panel">
 <label for="toolInput">Lernstoff</label>
-<textarea id="toolInput" placeholder="Text hier eingeben ..."></textarea>
+<textarea id="toolInput" placeholder="Text hier eingeben oder aus deinen Aufzeichnungen übernehmen ..."></textarea>
 <button class="primary" id="runTool">✨ Mit KI erstellen</button>
 </div>
 
@@ -165,6 +171,11 @@ getGenerativeModel,
 GoogleAIBackend
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-ai.js";
 
+import {
+initializeAppCheck,
+ReCaptchaEnterpriseProvider
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app-check.js";
+
 // FIREBASE KONFIGURATION
 
 const firebaseConfig = {
@@ -178,6 +189,20 @@ measurementId: "G-B848S8YF80"
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
+
+// FIREBASE APP CHECK
+
+const RECAPTCHA_ENTERPRISE_SITE_KEY =
+"6LeHCCIuAAAAACp1ImQBMfScdHO4x5P3yxuSQ6i0";
+
+const appCheck = initializeAppCheck(firebaseApp, {
+provider: new ReCaptchaEnterpriseProvider(
+RECAPTCHA_ENTERPRISE_SITE_KEY
+),
+isTokenAutoRefreshEnabled: true
+});
+
+// GEMINI KI
 
 const ai = getAI(firebaseApp, {
 backend: new GoogleAIBackend()
@@ -217,8 +242,6 @@ const $ = id => document.getElementById(id);
 let photos = [];
 let currentSubject = "";
 let previousPage = "home";
-let ocrEngine = null;
-let ocrLoading = false;
 let recognizing = false;
 let currentTool = "";
 let toolResultText = "";
@@ -566,110 +589,6 @@ setBusy(btn,false);
 
 $("aiRecognize").addEventListener("click",recognizeWithGemini);
 
-// PADDLE OCR
-
-async function getOcrEngine() {
-
-if(ocrEngine) return ocrEngine;
-
-if(ocrLoading) throw new Error("Das OCR-Modell wird bereits geladen.");
-
-ocrLoading = true;
-
-try {
-
-$("progress").textContent = "PaddleOCR wird geladen ...";
-
-const {PaddleOCR} = await import(
-"https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm"
-);
-
-ocrEngine = await PaddleOCR.create({
-lang:"de",
-ocrVersion:"PP-OCRv6",
-ortOptions:{
-backend:"wasm",
-wasmPaths:"https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/",
-numThreads:1,
-simd:true
-}
-});
-
-return ocrEngine;
-
-}
-finally {
-ocrLoading = false;
-}
-
-}
-
-async function recognizeWithPaddle() {
-
-if(recognizing) return;
-
-if(!photos.length) {
-alert("Bitte zuerst mindestens eine Seite auswählen.");
-return;
-}
-
-recognizing = true;
-
-const btn = $("ocrRecognize");
-
-setBusy(btn,true,"Texterkennung läuft ...");
-
-$("recognizedText").value = "";
-
-try {
-
-const ocr = await getOcrEngine();
-const pages = [];
-
-for(let i=0;i<photos.length;i++) {
-
-$("progress").textContent = `Schulbuchseite ${i+1} von ${photos.length} wird erkannt ...`;
-
-const blob = await preparePhoto(photos[i].file);
-const results = await ocr.predict(blob);
-const r = results?.[0];
-
-if(!r || !Array.isArray(r.items)) {
-throw new Error("Kein lesbares Ergebnis erhalten.");
-}
-
-pages.push(
-"--- Seite "+(i+1)+" ---\n\n"+
-r.items.map(x=>x.text).filter(t=>t?.trim()).join("\n")
-);
-
-}
-
-$("recognizedText").value = pages.join("\n\n");
-
-$("progress").textContent = "✅ Klassische Texterkennung abgeschlossen. Bitte Text kontrollieren.";
-
-}
-catch(err) {
-
-console.error(err);
-
-$("progress").textContent = "❌ Texterkennung fehlgeschlagen.";
-
-alert("PaddleOCR-Fehler: "+(err.message || err));
-
-}
-finally {
-
-recognizing = false;
-setBusy(btn,false);
-
-}
-
-}
-
-$("ocrRecognize").addEventListener("click",recognizeWithPaddle);
-
 // TEXT KOPIEREN
 
 $("copyText").addEventListener("click",async() => {
@@ -752,7 +671,7 @@ setBusy(btn,false);
 
 });
 
-// KI FUNKTION
+// GEMINI FUNKTION
 
 async function askAI(prompt) {
 
