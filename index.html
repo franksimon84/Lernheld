@@ -3,7 +3,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LernHeld</title>
 <style>
 * { box-sizing: border-box; }
@@ -16,50 +16,110 @@ body {
 header {
   background: #3978c8;
   color: white;
-  padding: 28px 20px;
   text-align: center;
+  padding: 27px 15px;
 }
 header h1 { margin: 0; font-size: 34px; }
 header p { margin-bottom: 0; }
-main { max-width: 700px; margin: auto; padding: 22px; }
+main { max-width: 750px; margin: auto; padding: 20px; }
 h2 { color: #315f99; }
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 .tile {
   background: white;
-  border-radius: 18px;
-  padding: 22px 10px;
+  border-radius: 17px;
+  padding: 19px 5px;
   text-align: center;
-  box-shadow: 0 3px 12px #00000010;
+  box-shadow: 0 3px 12px #00000012;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+.tile span {
+  display: block;
+  font-size: 32px;
+  margin-bottom: 9px;
+}
+.camera {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 22px;
+  border: 2px dashed #3978c8;
+  border-radius: 18px;
+  background: #e2efff;
+  color: #245d9e;
   font-size: 17px;
   font-weight: bold;
+  cursor: pointer;
 }
-.tile span { display: block; font-size: 34px; margin-bottom: 10px; }
-footer { text-align: center; padding: 25px; color: #718096; }
+.camera span {
+  display: block;
+  font-size: 38px;
+  margin-bottom: 8px;
+}
+input[type=file] { display: none; }
+footer {
+  text-align: center;
+  padding: 25px;
+  color: #718096;
+}
 </style>
 </head>
 <body>
+
 <header>
   <h1>⭐ LernHeld</h1>
   <p>Einfach lernen. Besser verstehen.</p>
 </header>
+
 <main>
   <h2>Hallo, LernHeld! 👋</h2>
   <p>Was möchtest du heute lernen?</p>
+
   <div class="grid">
-    <div class="tile"><span>📸</span>Heft fotografieren</div>
-    <div class="tile"><span>📚</span>Lernzettel</div>
-    <div class="tile"><span>🧠</span>Mindmaps</div>
-    <div class="tile"><span>🎴</span>Lernkarten</div>
-    <div class="tile"><span>🎯</span>Quiz</div>
-    <div class="tile"><span>🔊</span>Vorlesen</div>
+    <div class="tile"><span>📖</span>Deutsch</div>
     <div class="tile"><span>🇬🇧</span>Englisch</div>
-    <div class="tile"><span>👨‍👩‍👦</span>Elternbereich</div>
+    <div class="tile"><span>🔢</span>Mathematik</div>
+    <div class="tile"><span>🧬</span>Biologie</div>
+    <div class="tile"><span>🏛️</span>Geschichte</div>
+    <div class="tile"><span>⚡</span>Physik</div>
+    <div class="tile"><span>🧪</span>Chemie</div>
+    <div class="tile"><span>🌍</span>Erdkunde</div>
+    <div class="tile"><span>💼</span>Wirtschaft</div>
+    <div class="tile"><span>⚖️</span>Ethik</div>
+    <div class="tile"><span>🎵</span>Musik</div>
+    <div class="tile"><span>🏫</span>Sozialkunde</div>
   </div>
+
+  <label class="camera" for="photo">
+    <span>📸 ＋</span>
+    Neue Heftseite fotografieren
+    <small style="display:block;margin-top:8px;font-weight:normal">
+      Foto aufnehmen oder Bild auswählen
+    </small>
+  </label>
+
+  <input type="file" id="photo" accept="image/*" capture="environment">
+
+  <div id="status" style="margin-top:15px;text-align:center"></div>
 </main>
-<footer>LernHeld 1.0 · Gemeinsam stark lernen</footer>
+
+<footer>
+  LernHeld 1.0 · Gemeinsam stark lernen
+</footer>
+
+<script>
+document.getElementById("photo").addEventListener("change", function() {
+  const status = document.getElementById("status");
+  if (this.files.length) {
+    status.textContent = "Foto ausgewählt: " + this.files[0].name;
+  }
+});
+</script>
+
 </body>
 </html>
